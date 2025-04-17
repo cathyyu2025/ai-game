@@ -71,6 +71,70 @@
         .nav a:hover {
             color: #ff3366;
         }
+
+        /* 下拉菜单样式 */
+        .dropdown {
+            display: inline-block;
+            position: relative;
+        }
+        
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: rgba(0,0,0,0.8);
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            border-radius: 5px;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        
+        .dropdown-content a {
+            color: white;
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-content a:hover {
+            background-color: rgba(255,51,102,0.5);
+            color: #ffcc00;
+        }
+        
+        .game-btn {
+            display: inline-block;
+            margin: 10px;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff3366, #ff9933);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4);
+            transition: all 0.3s ease;
+        }
+        
+        .game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(255, 51, 102, 0.6);
+        }
+        
+        .games-container {
+            margin-top: 50px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
         
         .sakura {
             position: absolute;
@@ -93,7 +157,15 @@
         <a href="#travel">旅行</a>
         <a href="#culture">文化</a>
         <a href="#photos">照片</a>
-        <a href="kana1.html" class="game-link">练习游戏</a>
+        <div class="dropdown">
+            <a href="#" class="game-link">练习游戏 ▼</a>
+            <div class="dropdown-content">
+                <a href="kana1.html">五十音图练习</a>
+                <a href="vocabulary-game.html">单词记忆</a>
+                <a href="kanji-game.html">汉字书写</a>
+                <a href="conversation-game.html">会话练习</a>
+            </div>
+        </div>
         <a href="#contact">联系</a>
     </div>
     
@@ -101,20 +173,17 @@
         <h1>YUYANG'S JAPANESE WORLD</h1>
         <p class="subtitle">探索我的日本之旅与文化热爱</p>
         <div style="text-align: center; margin-top: 30px;">
-    <a href="kana1.html" class="game-btn" style="
-        display: inline-block;
-        padding: 12px 30px;
-        background: linear-gradient(45deg, #ff3366, #ff9933);
-        color: white;
-        text-decoration: none;
-        border-radius: 30px;
-        font-weight: bold;
-        font-size: 1.2em;
-        box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4);
-        transition: all 0.3s ease;
-        animation: pulse 2s infinite;
-    ">开始日语练习游戏</a>
-</div>
+
+               <!-- 游戏按钮区域 -->
+         <div class="dropdown">
+            <a href="#" class="game-btn">开始练习游戏 ▼</a>
+            <div class="dropdown-content">
+                <a href="kana1.html">五十音图练习</a>
+                <a href="vocabulary-game.html">单词记忆</a>
+                <a href="kanji-game.html">汉字书写</a>
+                <a href="conversation-game.html">会话练习</a>
+            </div>
+        </div>
 
 <style>
     @keyframes pulse {
