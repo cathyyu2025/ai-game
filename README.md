@@ -93,13 +93,36 @@
         <a href="#travel">旅行</a>
         <a href="#culture">文化</a>
         <a href="#photos">照片</a>
-        <a href="#games">练习游戏</a>
+        <a href="kana1.html">练习游戏</a>
         <a href="#contact">联系</a>
     </div>
     
     <div class="header">
         <h1>YUYANG'S JAPANESE WORLD</h1>
         <p class="subtitle">探索我的日本之旅与文化热爱</p>
+        <div style="text-align: center; margin-top: 30px;">
+    <a href="game.html" style="
+        display: inline-block;
+        padding: 12px 30px;
+        background: linear-gradient(45deg, #ff3366, #ff9933);
+        color: white;
+        text-decoration: none;
+        border-radius: 30px;
+        font-weight: bold;
+        font-size: 1.2em;
+        box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4);
+        transition: all 0.3s ease;
+        animation: pulse 2s infinite;
+    ">开始日语练习游戏</a>
+</div>
+
+<style>
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+</style>
     </div>
     
     <script>
