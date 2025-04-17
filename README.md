@@ -93,7 +93,7 @@
         <a href="#travel">旅行</a>
         <a href="#culture">文化</a>
         <a href="#photos">照片</a>
-        <a href="kana1.html" class="game-link">>练习游戏</a>
+        <a href="kana1.html" class="game-link">练习游戏</a>
         <a href="#contact">联系</a>
     </div>
     
