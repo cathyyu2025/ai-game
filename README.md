@@ -93,7 +93,7 @@
         <a href="#travel">旅行</a>
         <a href="#culture">文化</a>
         <a href="#photos">照片</a>
-        <a href="kana1.html">练习游戏</a>
+        <a href="kana1.html" class="game-link">>练习游戏</a>
         <a href="#contact">联系</a>
     </div>
     
@@ -101,7 +101,7 @@
         <h1>YUYANG'S JAPANESE WORLD</h1>
         <p class="subtitle">探索我的日本之旅与文化热爱</p>
         <div style="text-align: center; margin-top: 30px;">
-    <a href="kana1.html" style="
+    <a href="kana1.html" class="game-btn" style="
         display: inline-block;
         padding: 12px 30px;
         background: linear-gradient(45deg, #ff3366, #ff9933);
