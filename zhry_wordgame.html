@@ -1,0 +1,1298 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日本語単語ゲーム</title>
+    <style>
+        :root {
+            --sakura-pink: #ff5c8d; /* 更饱和的樱花粉 */
+            --sakura-dark-pink: #e8436d; /* 更饱和的深樱花粉 */
+            --leaf-green: #4caf50; /* 更饱和的叶绿色 */
+            --light-green: #a5d6a7; /* 更饱和的浅绿色 */
+            --background-color: #fff4f6; /* 浅粉背景 */
+            --text-color: #3e2723; /* 更深棕色文字 */
+            --light-text: #8d6e63; /* 浅棕色文字 */
+            --kana-color: #b39ddb; /* 淡紫色假名 */
+        }
+
+        body {
+            font-family: 'Meiryo', 'MS Gothic', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            flex: 1;
+            gap: 15px;
+        }
+
+        .left-panel {
+            flex: 3;
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(255, 92, 141, 0.3);
+        }
+
+        .right-panel {
+            flex: 1;
+            background-color: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 92, 141, 0.3);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 0px;
+            position: relative;
+        }
+
+        h1 {
+            color: var(--sakura-dark-pink);
+            margin-bottom: 5px;
+            font-size: 3rem;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            display: inline-block;
+            padding: 0px 0px;
+            border: 3px solid transparent;
+            border-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M20,20 Q30,10 40,20 T60,20 T80,20" fill="none" stroke="%23ff5c8d" stroke-width="2"/><path d="M20,40 Q30,30 40,40 T60,40 T80,40" fill="none" stroke="%23e8436d" stroke-width="2"/><path d="M20,60 Q30,50 40,60 T60,60 T80,60" fill="none" stroke="%234caf50" stroke-width="2"/><path d="M20,80 Q30,70 40,80 T60,80 T80,80" fill="none" stroke="%23b39ddb" stroke-width="2"/></svg>') 10 round;
+            background: linear-gradient(45deg, #ff5c8d, #e8436d, #4caf50, #b39ddb, #ff5c8d);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rainbow 8s ease infinite;
+            font-family: 'Meiryo', sans-serif; 
+        }
+
+        @keyframes rainbow {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+
+        .copyright {
+            color: var(--light-text);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .user-info-row {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            font-size: 20px;
+        }
+
+        .user-info-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .user-info-item label {
+            font-size: 16px;
+            color: var(--light-text);
+        }
+
+        .user-info-item input, 
+        .user-info-item select {
+            padding: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+         #start-btn {
+    font-size: 16px;  /* 增大按钮字体 */
+}
+        .game-area {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .meaning {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            text-align: center;
+            font-weight: bold;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+
+        .word {
+            font-size: 32px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: var(--sakura-dark-pink);
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .answer-input {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .answer-input span {
+            font-size: 22px;
+            margin: 0 5px;
+            border-bottom: 2px solid var(--sakura-pink);
+            min-width: 25px;
+            text-align: center;
+            padding-bottom: 3px;
+            color: var(--text-color);
+        }
+
+        .kana-selection {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .kana-row {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .kana-btn {
+            font-size: 20px;
+            padding: 10px 15px;
+            background-color: #FFE8D1; /* 改为浅杏色 */
+            color: #5A3921; /* 深棕色文字保证对比度 */
+            border: 1px solid #E6C9A0; /* 添加浅杏色边框 */
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .kana-btn:hover {
+            background-color: #FFD89C;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .stats {
+            background-color: rgba(255, 92, 141, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 92, 141, 0.2);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .stat-label {
+            color: var(--light-text);
+        }
+
+        .stat-value {
+            font-weight: bold;
+            color: var(--sakura-dark-pink);
+        }
+
+        .user-info {
+            margin-bottom: 20px;
+            padding: 12px;
+            background-color: rgba(76, 175, 80, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 12px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--leaf-green);
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: border 0.2s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--sakura-pink);
+        }
+
+        button {
+            background-color: var(--leaf-green);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: #388e3c;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+        }
+
+        .leaderboard {
+            flex: 1;
+            background-color: rgba(76, 175, 80, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+            overflow-y: auto;
+            border: 1px solid rgba(76, 175, 80, 0.2);
+        }
+
+        .leaderboard h3 {
+            color: var(--leaf-green);
+            margin-top: 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.3);
+            font-size: 14px;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(76, 175, 80, 0.2);
+            font-size: 12px;
+        }
+
+        .leaderboard-name {
+            font-weight: bold;
+            color: var(--sakura-dark-pink);
+        }
+
+        .leaderboard-score {
+            text-align: right;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--sakura-pink), var(--sakura-dark-pink));
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .file-input {
+            margin-bottom: 15px;
+        }
+
+        .lesson-selector {
+            margin-bottom: 15px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .attempt-info {
+      color: var(--sakura-dark-pink);
+    font-weight: bold;
+    margin-bottom: 12px;
+    text-align: left; /* 左上角对齐 */
+    font-size: 16px;
+    padding: 5px 10px;
+    background-color: rgba(255, 92, 141, 0.1);
+    border-radius: 4px;
+    display: inline-block;
+        }
+
+        /* 烟花效果 */
+        .firework {
+            position: fixed;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            box-shadow: 0 0 8px 4px;
+            animation: explode 0.8s ease-out forwards;
+            z-index: 100;
+        }
+
+        @keyframes explode {
+            0% {
+                transform: scale(0.1);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(15);
+                opacity: 0;
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .kana-row {
+                flex-wrap: wrap;
+            }
+            
+            .kana-btn {
+                font-size: 14px;
+                padding: 6px 10px;
+            }
+            
+            .word {
+                font-size: 28px;
+            }
+            
+            .answer-input span {
+                font-size: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+                padding: 10px 20px;
+            }
+            
+            .user-info-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>日本語単語ゲーム</h1>
+        <div class="copyright">@SJTU YuYang</div>
+        <div class="user-info-row">
+            <div class="user-info-item">
+                <label for="username">ユーザー名:</label>
+                <input type="text" id="username" placeholder="名前" style="width: 100px;">
+            </div>
+            <div class="user-info-item">
+                <label for="user-level">レベル:</label>
+                <select id="user-level" style="width: 80px;">
+                    <option value="beginner">初級</option>
+                    <option value="intermediate">中級</option>
+                    <option value="advanced">上級</option>
+                </select>
+            </div>
+            <div class="user-info-item">
+                <label for="lesson-select">レッスン:</label>
+                <select id="lesson-select" style="width: 120px;"></select>
+            </div>
+            <button id="start-btn">スタート</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="left-panel">
+            <div class="attempt-info" id="attempt-info"></div>
+            
+            <div class="game-area">
+                <div class="meaning" id="meaning">単語の意味がここに表示されます</div>
+                <div class="word" id="word">単語がここに表示されます</div>
+                <div class="answer-input" id="answer-input"></div>
+                <div class="kana-selection" id="kana-selection"></div>
+            </div>
+            
+            <div class="stats">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">正解:</span>
+                    <span class="stat-value" id="correct-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">問題数:</span>
+                    <span class="stat-value" id="total-count">0</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">正答率:</span>
+                    <span class="stat-value" id="accuracy">0</span>%
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">経過時間:</span>
+                    <span class="stat-value" id="time-elapsed">00:00</span>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button id="import-btn">単語リストをインポート</button>
+                <button id="export-btn">間違えた単語をエクスポート</button>
+                <button id="restart-btn">リスタート</button>
+            </div>
+            
+            <input type="file" id="file-input" accept=".txt,.csv,.xlsx,.xls" class="hidden">
+        </div>
+        
+        <div class="right-panel">
+            <div class="leaderboard">
+                <h3>リーダーボード</h3>
+                <div id="leaderboard-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <audio id="correct-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-correct-answer-tone-2870.mp3"></audio>
+    <audio id="wrong-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-wrong-answer-fail-notification-946.mp3"></audio>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // 默认单词库 - 综合日语第二册12课单词示例
+        const defaultVocabulary = {
+            "レッスン1": [
+                { word: "学生", meaning: "学生", reading: "がくせい" },
+                { word: "先生", meaning: "老师", reading: "せんせい" },
+                { word: "学校", meaning: "学校", reading: "がっこう" }
+            ],
+            "レッスン2": [
+                { word: "食べる", meaning: "吃", reading: "たべる" },
+                { word: "飲む", meaning: "喝", reading: "のむ" },
+                { word: "行く", meaning: "去", reading: "いく" }
+            ],
+            "レッスン3": [
+                { word: "大きい", meaning: "大的", reading: "おおきい" },
+                { word: "小さい", meaning: "小的", reading: "ちいさい" },
+                { word: "新しい", meaning: "新的", reading: "あたらしい" }
+            ],
+            "レッスン4": [
+                { word: "家族", meaning: "家人", reading: "かぞく" },
+                { word: "父", meaning: "父亲", reading: "ちち" },
+                { word: "母", meaning: "母亲", reading: "はは" }
+            ],
+            "レッスン5": [
+                { word: "時間", meaning: "时间", reading: "じかん" },
+                { word: "今日", meaning: "今天", reading: "きょう" },
+                { word: "明日", meaning: "明天", reading: "あした" }
+            ],
+            "レッスン6": [
+                { word: "天気", meaning: "天气", reading: "てんき" },
+                { word: "雨", meaning: "雨", reading: "あめ" },
+                { word: "雪", meaning: "雪", reading: "ゆき" }
+            ],
+            "レッスン7": [
+                { word: "動物", meaning: "动物", reading: "どうぶつ" },
+                { word: "猫", meaning: "猫", reading: "ねこ" },
+                { word: "犬", meaning: "狗", reading: "いぬ" }
+            ],
+            "レッスン8": [
+                { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+            ],
+            "レッスン10": [
+                { word: "国", meaning: "国家", reading: "くに" },
+                { word: "日本", meaning: "日本", reading: "にほん" },
+                { word: "中国", meaning: "中国", reading: "ちゅうごく" }
+            ],
+            "L10-U1Text": [
+{ word:  "うん", meaning:  "表示肯定、答应等。「はい」的口语化形式", reading:  "うん"},
+{ word:  "しばらく", meaning:  "暂时", reading:  "しばらく"},
+{ word:  "バイト", meaning:  "（アルバイト的省略说法）打工；勤工助学", reading:  "バイト"},
+{ word:  "同窓会", meaning:  "同窗会；同学会", reading:  "どうそうかい"},
+{ word:  "同窓", meaning:  "同窗；同学", reading:  "どうそう"},
+{ word:  "直前", meaning:  "(就在)～之前；快要～的时候", reading:  "ちょくぜん"},
+{ word:  "お願い", meaning:  "拜托；请求(礼貌说法)", reading:  "おねがい"},
+{ word:  "願い", meaning:  "愿望；请求", reading:  "ねがい"},
+{ word:  "進む", meaning:  "前进；推进；进展", reading:  "すすむ"},
+{ word:  "スランプ", meaning:  "消沉；萎靡", reading:  "スランプ"},
+{ word:  "合格", meaning:  "合格；及格", reading:  "ごうかく"},
+{ word:  "わよ", meaning:  "～啊；～呀", reading:  "わよ"}
+   ],
+            "L10-U1Ex": [
+{ word:  "知らせる", meaning:  "通知；告知", reading:  "しらせる"},
+{ word:  "ゆうべ", meaning:  "昨晚", reading:  "ゆうべ"},
+{ word:  "叔父", meaning:  "叔叔；舅舅；伯伯；姨夫；姑父", reading:  "おじ"},
+{ word:  "課長", meaning:  "科长", reading:  "かちょう"},
+{ word:  "命令形", meaning:  "(动词活用形之一)命令形", reading:  "めいれいけい"},
+{ word:  "命令", meaning:  "命令", reading:  "めいれい"},
+{ word:  "禁止形", meaning:  "(动词活用形之一)禁止形", reading:  "きんしけい"},
+{ word:  "尋ねる", meaning:  "询问；打听", reading:  "たずねる"},
+{ word:  "長所", meaning:  "长处；优点", reading:  "ちょうしょ"},
+{ word:  "センス", meaning:  "感觉；判断力；品味；审美", reading:  "センス"},
+{ word:  "本人", meaning:  "本人", reading:  "ほんにん"},
+{ word:  "自身", meaning:  "自身；本身", reading:  "じしん"},
+{ word:  "性格", meaning:  "性格", reading:  "せいかく"},
+{ word:  "正義感", meaning:  "正义感", reading:  "せいぎかん"},
+{ word:  "正義", meaning:  "正义", reading:  "せいぎ"},
+{ word:  "プラス", meaning:  "正面；好；正；加；加号", reading:  "プラス"},
+{ word:  "思考", meaning:  "思考；考虑", reading:  "しこう"},
+{ word:  "情熱", meaning:  "热情；激情", reading:  "じょうねつ"},
+{ word:  "粘り強い", meaning:  "坚韧(的)；有耐心(的)", reading:  "ねばりづよい"},
+{ word:  "包容力", meaning:  "包容力；包容的能力", reading:  "ほうようりょく"},
+{ word:  "包容", meaning:  "包容", reading:  "ほうよう"},
+{ word:  "-力", meaning:  "~力", reading:  "－りょく"},
+{ word:  "信用", meaning:  "信用；相信；信任", reading:  "しんよう"},
+{ word:  "社交", meaning:  "社交", reading:  "しゃこう"},
+{ word:  "愛想", meaning:  "态度；好心；善意", reading:  "あいそ"},
+{ word:  "さわやか", meaning:  "爽快(的)；清爽(的)", reading:  "さわやか"},
+{ word:  "無邪気", meaning:  "天真无邪(的)", reading:  "むじゃき"},
+{ word:  "楽観", meaning:  "乐观", reading:  "らっかん"},
+{ word:  "感受性", meaning:  "感受力", reading:  "かんじゅせい"},
+{ word:  "感受", meaning:  "感知；感受", reading:  "かんじゅ"},
+{ word:  "独創", meaning:  "独创", reading:  "どくそう"},
+{ word:  "富む", meaning:  "富有；富于", reading:  "とむ"},
+{ word:  "ユーモラス", meaning:  "幽默", reading:  "ユーモラス"},
+{ word:  "知的", meaning:  "知识丰富(的)；知性(的)", reading:  "ちてき"},
+{ word:  "理論", meaning:  "理论", reading:  "りろん"},
+{ word:  "思いやり", meaning:  "关怀；体谅；同情", reading:  "おもいやり"},
+{ word:  "誠実", meaning:  "诚实(的)", reading:  "せいじつ"},
+{ word:  "正直", meaning:  "正直(的)；诚实(的)；实在", reading:  "しょうじき"},
+{ word:  "真面目", meaning:  "认真(的)", reading:  "まじめ"},
+{ word:  "素朴", meaning:  "朴素(的)；简单(的)", reading:  "そばく"},
+{ word:  "礼儀正しい", meaning:  "有礼貌；懂礼貌", reading:  "れいぎただしい"},
+{ word:  "礼儀", meaning:  "礼仪；礼貌", reading:  "れいぎ"},
+{ word:  "几帳面", meaning:  "一丝不苟(的)；认真的(的)；规规矩矩(的)", reading:  "きちょうめん"},
+{ word:  "慎重", meaning:  "慎重(的)", reading:  "しんちょう"},
+{ word:  "我慢強い", meaning:  "忍耐力强(的)", reading:  "がまんづよい"},
+{ word:  "我慢", meaning:  "忍耐；忍受", reading:  "がまん"}
+   ],
+            "L10-U2Text": [
+{ word:  "何だか", meaning:  "不知为何；不知怎么", reading:  "なんだか"},
+{ word:  "いくら", meaning:  "怎么(～也～)；多少", reading:  "いくら"},
+{ word:  "上達", meaning:  "进步；长进", reading:  "じょうたつ"},
+{ word:  "なめらか", meaning:  "光滑；流利", reading:  "なめらか"},
+{ word:  "ねえ", meaning:  "用于引起别人注意", reading:  "ねえ"},
+{ word:  "せい", meaning:  "因为；由于", reading:  "せい"},
+{ word:  "気分転換", meaning:  "转换心情", reading:  "きぶんでんかん"},
+{ word:  "転換", meaning:  "转换", reading:  "てんかん"},
+{ word:  "MELODY", meaning:  "（课文中指KTV的名字）麦乐迪；旋律；曲调", reading:  "メロディー"},
+{ word:  "早速", meaning:  "马上；立刻", reading:  "さっそく"},
+{ word:  "なら", meaning:  "如果是～；要是～；～的话", reading:  "なら"}
+   ],
+            "L10-U2Ex": [
+{ word:  "胃", meaning:  "胃", reading:  "い"},
+{ word:  "台無し", meaning:  "（努力、成绩等）化为乌有，毁于一旦", reading:  "だいなし"},
+{ word:  "書店", meaning:  "书店", reading:  "しょてん"},
+{ word:  "-製", meaning:  "～制造", reading:  "－せい"},
+{ word:  "品質", meaning:  "品质；质量", reading:  "ひんしつ"},
+{ word:  "湖南", meaning:  "湖南", reading:  "こなん"},
+{ word:  "四川", meaning:  "四川", reading:  "しせん"},
+{ word:  "電気屋", meaning:  "电器商店", reading:  "でんきや"},
+{ word:  "慰める", meaning:  "安慰；使轻松；使愉快", reading:  "なぐさめる"},
+{ word:  "ふる", meaning:  "挥；摇", reading:  "ふる"},
+{ word:  "落ち込む", meaning:  "心情低落；难过", reading:  "おちこむ"},
+{ word:  "やる気", meaning:  "千劲儿", reading:  "やるき"},
+{ word:  "誤操作", meaning:  "错误操作", reading:  "ごそうさ"}
+   ],
+            "L10-U3Text": [
+{ word:  "投稿", meaning:  "投稿", reading:  "とうこう"},
+{ word:  "なんとか", meaning:  "想办法；尽量", reading:  "なんとか"},
+{ word:  "ついていく", meaning:  "跟上；跟得上", reading:  "ついていく"},
+{ word:  "返信", meaning:  "回信", reading:  "へんしん"},
+{ word:  "休学", meaning:  "休学", reading:  "きゅうがく"},
+{ word:  "思い切って", meaning:  "下决心；毅然决定；豁出去", reading:  "おもいきって"},
+{ word:  "見つかる", meaning:  "发现；找到", reading:  "みつかる"},
+{ word:  "哲学", meaning:  "哲学", reading:  "てつがく"},
+{ word:  "編入", meaning:  "转入；插入；后进入；后加入", reading:  "へんにゅう"},
+{ word:  "見つめる", meaning:  "凝视；直视；直面", reading:  "みつめる"},
+{ word:  "プラトン", meaning:  "柏拉图", reading:  "プラトン"}
+   ],
+            "L10-U3Ex": [
+{ word:  "納得", meaning:  "领会；同意", reading:  "なっとく"},
+{ word:  "向く", meaning:  "朝；向；适合", reading:  "むく"},
+{ word:  "正解", meaning:  "正解", reading:  "せいかい"},
+{ word:  "なんとなく", meaning:  "不知为何；总觉得；无意中", reading:  "なんとなく"},
+{ word:  "信頼", meaning:  "信赖，信任", reading:  "しんらい"},
+{ word:  "ワクチン", meaning:  "疫苗", reading:  "ワクチン"},
+{ word:  "接種", meaning:  "接种", reading:  "せっしゅ"},
+{ word:  "渋滞", meaning:  "滞缓；堵车；进展不顺", reading:  "じゅうたい"},
+{ word:  "おもちゃ", meaning:  "玩具", reading:  "おもちゃ"},
+{ word:  "服", meaning:  "衣服；装束", reading:  "ふく"},
+{ word:  "コメント", meaning:  "评论；说明", reading:  "コメント"} 
+            ],
+  "L11-U1Text": [
+{word: "試す", meaning: "试验；尝试", reading: "ためす"},
+{word: "さえ", meaning: "连；甚至", reading: "さえ"},
+{word: "-代", meaning: "~费用；（世代）辈；年龄、年代的范围", reading: "-だい"}
+ ],
+  "L11-U1Ex": [
+{word: "気になる", meaning: "担心；忧虑；介意", reading: "きになる"},
+{word: "干す", meaning: "晒；晾；弄干", reading: "ほす"},
+{word: "要望", meaning: "希望，要求", reading: "ようぼう"},
+{word: "IT", meaning: "信息技术；IT", reading: "アイティー"},
+{word: "医療", meaning: "医疗", reading: "いりょう"},
+{word: "生き物", meaning: "生物；有生命的事物", reading: "いきもの"}
+  ],
+  "L11-U2Text": [
+{word: "丸井", meaning: "（姓氏）丸井", reading: "まるい"},
+{word: "わたくし", meaning: "（第一人称代词）我", reading: "わたくし"},
+{word: "人事", meaning: "人事", reading: "じんじ"},
+{word: "いらしてください", meaning: "请您来一趟（意同「いらっしゃってください」，也是一种尊敬的表达方式。）", reading: "いらしてください"},
+{word: "限る", meaning: "限；限制；限于", reading: "かぎる"}
+ ],
+  "L11-U2Ex": [
+{word: "自治体", meaning: "自治体（日本指都道府县市町村）", reading: "じちたい"},
+{word: "光熱費", meaning: "电费，燃气费", reading: "こうねつひ"},
+{word: "委員会", meaning: "委員会", reading: "いいんかい"},
+{word: "委員", meaning: "委員", reading: "いいん"},
+{word: "草案", meaning: "草案；草稿", reading: "そうあん"},
+{word: "作成", meaning: "制作；作成", reading: "さくせい"},
+{word: "野党", meaning: "在野党", reading: "やとう"},
+{word: "示す", meaning: "表示；呈现", reading: "しめす"},
+{word: "有利", meaning: "有利", reading: "ゆうり"},
+{word: "高級", meaning: "高级；上等", reading: "こうきゅう"},
+{word: "依頼", meaning: "请；委托；依赖，依靠", reading: "いらい"},
+{word: "少々", meaning: "稍稍；稍微", reading: "しょうしょう"},
+{word: "指名", meaning: "点名；指名；指定", reading: "しめい"},
+{word: "役", meaning: "角色；作用", reading: "やく"},
+{word: "交代", meaning: "交替；轮换", reading: "こうたい"},
+{word: "反省", meaning: "反省", reading: "はんせい"}
+  ],
+  "L11-U3Text": [
+{word: "重視", meaning: "重视", reading: "じゅうし"},
+{word: "単なる", meaning: "单纯(的)；单；仅", reading: "たんなる"},
+{word: "プラスα", meaning: "附加值；附加分；附加", reading: "プラスアルファ"},
+{word: "加える", meaning: "加；加上；包含", reading: "くわえる"},
+{word: "プラス志向", meaning: "好的志向；正面追求；上进心；乐观心态", reading: "プラスしこう"},
+{word: "志向", meaning: "立志；志向；追求", reading: "しこう"},
+{word: "とらえる", meaning: "理解；体会；捕捉；抓住", reading: "とらえる"},
+{word: "キーワード", meaning: "关键词", reading: "キーワード"},
+{word: "実例", meaning: "实例；实际的例子", reading: "じつれい"},
+{word: "説得力", meaning: "说服力", reading: "せっとくりょく"},
+{word: "説得", meaning: "说服", reading: "せっとく"},
+{word: "アンテナ", meaning: "天线", reading: "アンテナ"},
+{word: "張る", meaning: "伸展；张开", reading: "はる"},
+{word: "自ら", meaning: "自己；自身；亲自", reading: "みずから"},
+{word: "働きかける", meaning: "作用；影响；推动", reading: "はたらきかける"},
+{word: "姿勢", meaning: "姿态；态度", reading: "しせい"},
+{word: "意欲", meaning: "愿望；意愿", reading: "いよく"},
+{word: "問う", meaning: "问", reading: "とう"},
+{word: "意識", meaning: "意识；认识", reading: "いしき"},
+{word: "一夜漬け", meaning: "仓促上阵；临阵磨枪", reading: "いちやづけ"},
+{word: "身だしなみ", meaning: "举止得体；（有）教养；修养", reading: "みだしなみ"},
+{word: "中身", meaning: "内容", reading: "なかみ"},
+{word: "外見", meaning: "外表", reading: "がいけん"},
+{word: "不快", meaning: "不(愉)快", reading: "ふかい"},
+{word: "清潔", meaning: "清洁", reading: "せいけつ"},
+{word: "間際", meaning: "就在～之前；临到～的时候", reading: "まぎわ"},
+{word: "初志貫徹", meaning: "矢志不渝；不改初衷", reading: "しょしかんでつ"},
+{word: "初志", meaning: "初衷；最初的意志", reading: "しょし"},
+{word: "貫徹", meaning: "贯彻", reading: "かんでつ"}
+            ],
+  "L11-U3Ex": [
+{word: "一言", meaning: "只言片语；几句话", reading: "ひとこと"},
+{word: "花粉症", meaning: "花粉症，由于花粉所引起的呼吸道过敏症", reading: "かふんしょう"},
+{word: "憂鬱", meaning: "忧虑；忧郁不安", reading: "ゆううつ"},
+{word: "態度", meaning: "态度", reading: "たいど"},
+{word: "飼い主", meaning: "饲养主；宠物的主人", reading: "かいぬし"} 
+            ],
+            "L12-UNIT1": [
+ {word: "旅立ち", meaning: "去旅行；启程", reading: "たびだち" },
+{word: "ご存じ", meaning: "（「知る」的尊敬说法）知道", reading: "ごぞんじ" },
+{word: "申し上げる", meaning: "（「言う」的自谦说法）说；讲", reading: "もうしあげる" },
+{word: "これから", meaning: "今后；将来", reading: "これから" },
+{word: "さよなら", meaning: "（「さようなら」的简略说法）再见", reading: "さよなら" }
+ ],
+            "L12-U1Ex": [
+{word: "泊まる", meaning: "停泊；投宿，住宿", reading: "とまる" },
+{word: "賛成", meaning: "赞成；同意", reading: "さんせい" }
+            ],
+  "L12-U2Text": [
+{word: "別れ", meaning: "分别；离别", reading: "わかれ" },
+{word: "歓送会", meaning: "欢送会", reading: "かんそうかい" },,
+{word: "角", meaning: "角；角落；棱角", reading: "かど" },
+{word: "ぶつかる", meaning: "撞；碰撞", reading: "ぶつかる" },
+{word: "取り合う", meaning: "相互取得(联系)", reading: "とりあう" }
+ ],
+  "L12-U2Ex": [
+{word: "知り合う", meaning: "相识；认识", reading: "しりあう" },
+{word: "降り出す", meaning: "开始下(雨、雪)", reading: "ふりだす" },
+{word: "少子", meaning: "出生率低", reading: "しょうし" },
+{word: "高齢化", meaning: "老龄化", reading: "こうれいか" },
+{word: "徐々", meaning: "慢慢；逐渐", reading: "じょじょ" },
+{word: "だんだん", meaning: "逐渐", reading: "だんだん" },
+{word: "出来事", meaning: "事情，实践", reading: "できごと" },
+{word: "先入観", meaning: "成见；先入为主", reading: "せんにゅうかん" }
+  ],
+  "L12-U3Text": [
+{word: "-観", meaning: "~观", reading: "－かん" },
+{word: "けれども", meaning: "可是；但是", reading: "けれども" },
+{word: "熱気", meaning: "高涨的热情；热烈的气氛", reading: "ねっき" },
+{word: "興奮", meaning: "兴奋", reading: "こうふん" },
+{word: "いつの間にか", meaning: "不知何时；不知不觉", reading: "いつのまにか" },
+{word: "同士", meaning: "伙伴；具有相同关系或性质的人群（事物）", reading: "どうし" },
+{word: "異なる", meaning: "不同", reading: "ことなる" },
+{word: "貴重", meaning: "贵重；珍贵", reading: "きちょう" },
+{word: "恐れる", meaning: "害怕；畏惧", reading: "おそれる" },
+{word: "大いに", meaning: "很；大大地；非常", reading: "おおいに" }
+            ]
+        };
+
+        let vocabulary = JSON.parse(JSON.stringify(defaultVocabulary));
+        let currentLesson = "";
+        let currentWords = [];
+        let currentIndex = 0;
+        let correctCount = 0;
+        let userAnswers = [];
+        let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+        let startTime = null;
+        let timerInterval = null;
+        let attemptCount = 1;
+        let wrongWords = [];
+        let currentSessionWords = [];
+        
+        // 五十音图
+        const hiragana = [
+            ['あ', 'い', 'う', 'え', 'お'],
+            ['か', 'き', 'く', 'け', 'こ'],
+            ['さ', 'し', 'す', 'せ', 'そ'],
+            ['た', 'ち', 'つ', 'て', 'と'],
+            ['な', 'に', 'ぬ', 'ね', 'の'],
+            ['は', 'ひ', 'ふ', 'へ', 'ほ'],
+            ['ま', 'み', 'む', 'め', 'も'],
+            ['や', '', 'ゆ', '', 'よ'],
+            ['ら', 'り', 'る', 'れ', 'ろ'],
+            ['わ', '', '', '', 'を'],
+            ['ん'],
+            ['が', 'ぎ', 'ぐ', 'げ', 'ご'],
+            ['ざ', 'じ', 'ず', 'ぜ', 'ぞ'],
+            ['だ', 'ぢ', 'づ', 'で', 'ど'],
+            ['ば', 'び', 'ぶ', 'べ', 'ぼ'],
+            ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ'],
+            ['ゃ', 'ゅ', 'ょ'], 
+        ];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            updateLessonSelect();
+            updateLeaderboard();
+            
+            document.getElementById('import-btn').addEventListener('click', function() {
+                document.getElementById('file-input').click();
+            });
+            
+            document.getElementById('export-btn').addEventListener('click', exportWrongWords);
+            document.getElementById('restart-btn').addEventListener('click', resetGame);
+            document.getElementById('file-input').addEventListener('change', handleFileImport);
+            document.getElementById('start-btn').addEventListener('click', startGame);
+            
+            // 自动检查答案当所有空格填满时
+            document.addEventListener('input', function() {
+                if (currentWords.length > 0 && isAnswerComplete()) {
+                    setTimeout(checkAnswer, 300);
+                }
+            });
+        });
+
+        function updateLessonSelect() {
+            const select = document.getElementById('lesson-select');
+            select.innerHTML = '';
+            
+            for (const lesson in vocabulary) {
+                const option = document.createElement('option');
+                option.value = lesson;
+                option.textContent = lesson;
+                select.appendChild(option);
+            }
+        }
+
+        function handleFileImport(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                        // 处理Excel文件
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        // 假设Excel格式为: 列A:单词, 列B:意思, 列C:读音
+                        const newVocabulary = {};
+                        const lessonName = file.name.split('.')[0];
+                        newVocabulary[lessonName] = jsonData.map(row => ({
+                            word: row['単語'] || row['word'] || row['Word'] || Object.values(row)[0],
+                            meaning: row['意味'] || row['meaning'] || row['Meaning'] || Object.values(row)[1],
+                            reading: row['読み'] || row['reading'] || row['Reading'] || Object.values(row)[2]
+                        }));
+                        
+                        vocabulary = { ...vocabulary, ...newVocabulary };
+                    } else {
+                        // 处理文本文件
+                        const content = e.target.result;
+                        const lines = content.split('\n');
+                        const newVocabulary = {};
+                        const lessonName = file.name.split('.')[0];
+                        newVocabulary[lessonName] = [];
+                        
+                        for (const line of lines) {
+                            if (line.trim()) {
+                                const parts = line.split('\t');
+                                if (parts.length >= 3) {
+                                    newVocabulary[lessonName].push({
+                                        word: parts[0].trim(),
+                                        meaning: parts[1].trim(),
+                                        reading: parts[2].trim()
+                                    });
+                                }
+                            }
+                        }
+                        
+                        vocabulary = { ...vocabulary, ...newVocabulary };
+                    }
+                    
+                    updateLessonSelect();
+                    alert('単語リストが正常にインポートされました！');
+                } catch (error) {
+                    console.error(error);
+                    alert('ファイルのインポートに失敗しました。形式を確認してください。');
+                }
+            };
+            
+            if (file.name.endsWith('.xlsx') || file.name.endsWith('.xls')) {
+                reader.readAsArrayBuffer(file);
+            } else {
+                reader.readAsText(file);
+            }
+        }
+
+        function startGame() {
+            const lessonSelect = document.getElementById('lesson-select');
+            currentLesson = lessonSelect.value;
+            
+            // 如果是第一次尝试，使用完整的单词列表
+            if (attemptCount === 1) {
+                currentSessionWords = [...vocabulary[currentLesson]];
+                wrongWords = [];
+            } else {
+                // 后续尝试使用错题+部分正确题目
+                const correctWords = userAnswers.filter(a => a.isCorrect).map(a => ({
+                    word: a.word,
+                    meaning: a.meaning,
+                    reading: a.correctReading
+                }));
+                
+                // 随机选择一些正确题目加入练习
+                const randomCorrectWords = [];
+                const correctCountToAdd = Math.min(2, correctWords.length);
+                
+                for (let i = 0; i < correctCountToAdd; i++) {
+                    const randomIndex = Math.floor(Math.random() * correctWords.length);
+                    randomCorrectWords.push(correctWords[randomIndex]);
+                    correctWords.splice(randomIndex, 1);
+                }
+                
+                currentSessionWords = [...wrongWords, ...randomCorrectWords];
+            }
+            
+            currentWords = [...currentSessionWords];
+            shuffleArray(currentWords);
+            
+            currentIndex = 0;
+            correctCount = 0;
+            userAnswers = [];
+            
+            document.getElementById('correct-count').textContent = '0';
+            document.getElementById('total-count').textContent = currentWords.length;
+            document.getElementById('accuracy').textContent = '0';
+            document.getElementById('progress').style.width = '0%';
+            document.getElementById('attempt-info').textContent = `ROUND${attemptCount}`;
+            
+            // 开始计时
+            startTime = new Date();
+            if (timerInterval) clearInterval(timerInterval);
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            showNextWord();
+        }
+
+        function showNextWord() {
+            if (currentIndex >= currentWords.length) {
+                endGame();
+                return;
+            }
+            
+            const currentWord = currentWords[currentIndex];
+            document.getElementById('meaning').textContent = currentWord.meaning;
+            document.getElementById('word').textContent = currentWord.word;
+            
+            // 设置答案输入框
+            const answerInput = document.getElementById('answer-input');
+            answerInput.innerHTML = '';
+            
+            const reading = currentWord.reading;
+            for (let i = 0; i < reading.length; i++) {
+                const char = reading[i];
+                const span = document.createElement('span');
+                span.textContent = '_';
+                span.dataset.index = i;
+                answerInput.appendChild(span);
+            }
+            
+            // 生成随机假名选项
+            generateKanaOptions(reading);
+            
+            // 更新进度
+            const progress = (currentIndex / currentWords.length) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+
+        function generateKanaOptions(correctReading) {
+            const kanaSelection = document.getElementById('kana-selection');
+            kanaSelection.innerHTML = '';
+            
+            // 收集所有需要的假名
+            const neededKana = new Set();
+            for (const char of correctReading) {
+                neededKana.add(char);
+            }
+            
+            // 添加一些随机假名
+            const allKana = [];
+            hiragana.forEach(row => {
+                row.forEach(kana => {
+                    if (kana) allKana.push(kana);
+                });
+            });
+            
+            // 确保有足够的假名选项
+            const totalOptions = 18;
+            const options = Array.from(neededKana);
+            
+            while (options.length < totalOptions) {
+                const randomIndex = Math.floor(Math.random() * allKana.length);
+                const randomKana = allKana[randomIndex];
+                if (!options.includes(randomKana)) {
+                    options.push(randomKana);
+                }
+            }
+            
+            // 打乱顺序
+            shuffleArray(options);
+            
+            // 创建按钮 (8, 6, 4 的布局)
+            const rowSizes = [8, 6, 4];
+            let optionIndex = 0;
+            
+            for (let i = 0; i < rowSizes.length; i++) {
+                const rowSize = rowSizes[i];
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'kana-row';
+                
+                for (let j = 0; j < rowSize; j++) {
+                    if (optionIndex >= options.length) break;
+                    
+                    const kana = options[optionIndex];
+                    const button = document.createElement('button');
+                    button.className = 'kana-btn';
+                    button.textContent = kana;
+                    button.addEventListener('click', function() {
+                        selectKana(kana);
+                    });
+                    
+                    rowDiv.appendChild(button);
+                    optionIndex++;
+                }
+                
+                kanaSelection.appendChild(rowDiv);
+            }
+        }
+
+        function selectKana(kana) {
+            const answerSpans = document.querySelectorAll('#answer-input span');
+            
+            for (const span of answerSpans) {
+                if (span.textContent === '_') {
+                    span.textContent = kana;
+                    span.dataset.kana = kana;
+                    break;
+                }
+            }
+            
+            // 如果所有空格都已填满，自动检查答案
+            if (isAnswerComplete()) {
+                setTimeout(checkAnswer, 300);
+            }
+        }
+
+        function isAnswerComplete() {
+            const answerSpans = document.querySelectorAll('#answer-input span');
+            for (const span of answerSpans) {
+                if (span.textContent === '_') return false;
+            }
+            return true;
+        }
+
+        function checkAnswer() {
+            const currentWord = currentWords[currentIndex];
+            const correctReading = currentWord.reading;
+            
+            const answerSpans = document.querySelectorAll('#answer-input span');
+            let userAnswer = '';
+            
+            for (const span of answerSpans) {
+                userAnswer += span.dataset.kana || '_';
+            }
+            
+            const isCorrect = userAnswer === correctReading;
+            
+            userAnswers.push({
+                word: currentWord.word,
+                meaning: currentWord.meaning,
+                correctReading: correctReading,
+                userAnswer: userAnswer,
+                isCorrect: isCorrect
+            });
+            
+            if (isCorrect) {
+                correctCount++;
+                document.getElementById('correct-count').textContent = correctCount;
+                playCorrectSound();
+                createFireworks();
+            } else {
+                // 记录错题
+                wrongWords.push({
+                    word: currentWord.word,
+                    meaning: currentWord.meaning,
+                    reading: currentWord.reading
+                });
+                playWrongSound();
+            }
+            
+            // 更新准确率
+            const accuracy = Math.round((correctCount / (currentIndex + 1)) * 100);
+            document.getElementById('accuracy').textContent = accuracy;
+            
+            currentIndex++;
+            setTimeout(showNextWord, isCorrect ? 800 : 1200);
+        }
+
+        function endGame() {
+            clearInterval(timerInterval);
+            document.getElementById('progress').style.width = '100%';
+            
+            const accuracy = Math.round((correctCount / currentWords.length) * 100);
+            const username = document.getElementById('username').value || '匿名';
+            const userLevel = document.getElementById('user-level').value;
+            
+            // 添加到排行榜
+            leaderboard.push({
+                name: username,
+                level: userLevel,
+                score: correctCount,
+                total: currentWords.length,
+                accuracy: accuracy,
+                date: new Date().toLocaleDateString(),
+                lesson: currentLesson,
+                time: document.getElementById('time-elapsed').textContent
+            });
+            
+            // 按分数排序
+            leaderboard.sort((a, b) => b.accuracy - a.accuracy || b.score - a.score);
+            
+            // 保留前10名
+            if (leaderboard.length > 10) {
+                leaderboard = leaderboard.slice(0, 10);
+            }
+            
+            // 保存到本地存储
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+            
+            // 更新排行榜显示
+            updateLeaderboard();
+            
+            // 如果有错题，准备下一次尝试
+            if (wrongWords.length > 0 && attemptCount < 3) {
+                attemptCount++;
+                setTimeout(() => {
+                    if (confirm(`第{attemptCount-1}回挑戦終了！正解数: ${correctCount}/${currentWords.length}\n正答率: ${accuracy}%\n\n間違えた単語を再度練習しますか？`)) {
+                        startGame();
+                    }
+                }, 800);
+            } else {
+                // 全部完成
+                setTimeout(() => {
+                    const message = attemptCount === 3 ? 
+                        `おめでとうございます！すべての単語を正解しました！\n最終成績: ${correctCount}/${currentWords.length}\n正答率: ${accuracy}%` :
+                        `ゲーム終了！\n正解数: ${correctCount}/${currentWords.length}\n正答率: ${accuracy}%`;
+                    
+                    alert(message);
+                }, 800);
+            }
+        }
+
+        function updateLeaderboard() {
+            const leaderboardList = document.getElementById('leaderboard-list');
+            leaderboardList.innerHTML = '';
+            
+            if (leaderboard.length === 0) {
+                leaderboardList.innerHTML = '<p>まだ記録がありません</p>';
+                return;
+            }
+            
+            leaderboard.forEach((entry, index) => {
+                const item = document.createElement('div');
+                item.className = 'leaderboard-item';
+                item.innerHTML = `
+                    <div class="leaderboard-name">${index + 1}. ${entry.name} (${getLevelText(entry.level)})</div>
+                    <div class="leaderboard-score">${entry.accuracy}% (${entry.score}/${entry.total})<br>${entry.time}</div>
+                `;
+                leaderboardList.appendChild(item);
+            });
+        }
+
+        function getLevelText(level) {
+            switch(level) {
+                case 'beginner': return '初級';
+                case 'intermediate': return '中級';
+                case 'advanced': return '上級';
+                default: return '';
+            }
+        }
+
+        function updateTimer() {
+            if (!startTime) return;
+            
+            const now = new Date();
+            const elapsed = Math.floor((now - startTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            
+            document.getElementById('time-elapsed').textContent = `${minutes}:${seconds}`;
+        }
+
+        function exportWrongWords() {
+            if (wrongWords.length === 0) {
+                alert('間違えた単語がありません');
+                return;
+            }
+            
+            let csvContent = "単語,意味,読み\n";
+            wrongWords.forEach(word => {
+                csvContent += `${word.word},${word.meaning},${word.reading}\n`;
+            });
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `間違えた単語_${currentLesson}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function resetGame() {
+            clearInterval(timerInterval);
+            currentWords = [];
+            currentIndex = 0;
+            correctCount = 0;
+            userAnswers = [];
+            wrongWords = [];
+            attemptCount = 1;
+            startTime = null;
+            
+            document.getElementById('meaning').textContent = '単語の意味がここに表示されます';
+            document.getElementById('word').textContent = '単語がここに表示されます';
+            document.getElementById('answer-input').innerHTML = '';
+            document.getElementById('kana-selection').innerHTML = '';
+            document.getElementById('correct-count').textContent = '0';
+            document.getElementById('total-count').textContent = '0';
+            document.getElementById('accuracy').textContent = '0';
+            document.getElementById('progress').style.width = '0%';
+            document.getElementById('time-elapsed').textContent = '00:00';
+            document.getElementById('attempt-info').textContent = '';
+        }
+
+        function playCorrectSound() {
+            const sound = document.getElementById('correct-sound');
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        function playWrongSound() {
+            const sound = document.getElementById('wrong-sound');
+            sound.currentTime = 0;
+            sound.play();
+        }
+
+        function createFireworks() {
+            const colors = ['#ff5c8d', '#e8436d', '#4caf50', '#ff9966', '#ff7e5f'];
+            
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    firework.style.left = `${x}px`;
+                    firework.style.top = `${y}px`;
+                    firework.style.color = color;
+                    
+                    document.body.appendChild(firework);
+                    
+                    setTimeout(() => {
+                        firework.remove();
+                    }, 1000);
+                }, i * 100);
+            }
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+    </script>
+</body>
+</html>
