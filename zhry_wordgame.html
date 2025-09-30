@@ -473,10 +473,11 @@ color: #333; /* 深色文字保证可读性 */
             <div class="user-info-item">
                 <label for="user-level">レベル:</label>
                 <select id="user-level" style="width: 80px;">
-                    <option value="beginner">初級</option>
-                    <option value="intermediate">中級</option>
-                    <option value="advanced">上級</option>
-                </select>
+                    <option value="zhry1">総合日語1</option>
+                    <option value="zhry2">総合日語2</option>
+                    <option value="zhry3">総合日語3</option>
+                    <option value="zhry4">総合日語4</option>    
+            </select>
             </div>
             <div class="user-info-item">
                 <label for="lesson-select">レッスン:</label>
@@ -548,7 +549,7 @@ color: #333; /* 深色文字保证可读性 */
     <script>
         // 默认单词库 - 按级别分类
         const defaultVocabulary = {
-            "beginner": {
+            "zhry1": {
                 "レッスン1": [
                     { word: "学生", meaning: "学生", reading: "がくせい" },
                     { word: "先生", meaning: "老师", reading: "せんせい" },
@@ -565,7 +566,7 @@ color: #333; /* 深色文字保证可读性 */
                     { word: "新しい", meaning: "新的", reading: "あたらしい" }
                 ]
             },
-            "intermediate": {
+            "zhry2": {
                 "L7-U1Text": [
 {word: "廊下", meaning: "走廊；廊下", reading: "ろうか"}, 
 {word: "ディズニーリゾート", meaning: "迪士尼度假区", reading: "ディズニーリゾート"}, 
@@ -1176,7 +1177,65 @@ color: #333; /* 深色文字保证可读性 */
 {word: "大いに", meaning: "很；大大地；非常", reading: "おおいに" }
             ]
         },
-            "advanced": {
+            "zhry3": {
+               "L1-U1Text": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" } 
+                     ],
+               "L1-U2Text": [
+{ word: "本学①", meaning: "本校（专指大学）", reading: "ほんがく" },
+{ word: "絞る②", meaning: "挤；限定；集中", reading: "しぼる" },
+{ word: "設ける③", meaning: "准备；设立；设置", reading: "もうける" },
+{ word: "無論⓪", meaning: "当然；不用说", reading: "むろん" },
+{ word: "必修⓪", meaning: "必修；必选", reading: "ひっしゅう" },
+{ word: "概して①", meaning: "一般；大体；大概", reading: "がいして" },
+{ word: "時間帯⓪", meaning: "时间带；时间段", reading: "じかんたい" },
+{ word: "まかす（任す）②", meaning: "交给；听任；任凭", reading: "まかす" },
+{ word: "作業①", meaning: "作业；操作", reading: "さぎょう" },
+{ word: "自主性⓪", meaning: "自主性", reading: "じしゅせい" },
+{ word: "自主①", meaning: "自主；独立自主；主动", reading: "じしゅ" },
+{ word: "主体性⓪", meaning: "主体性；独立性", reading: "しゅたいせい" },
+{ word: "主体⓪", meaning: "主体，核心", reading: "しゅたい" },
+{ word: "確立⓪", meaning: "确立", reading: "かくりつ" },
+{ word: "区切り③", meaning: "阶段；句子的停顿处；段落", reading: "くぎり" },
+{ word: "履修ガイド④", meaning: "学习指导；课程指导", reading: "りしゅうガイド" },
+{ word: "山の手⓪", meaning: "（在农村或城镇里）靠山的地方；城市中地势较高的地区（在东京特指四谷、青山、市谷、小石川等住宅密集的地区）", reading: "やまのて" },
+{ word: "下町⓪", meaning: "（都市中的）低洼地区；在东京特指下谷、浅草、神田、日本桥等老城区", reading: "したまち" },
+{ word: "教材⓪", meaning: "教材；教科书", reading: "きょうざい" },
+{ word: "教具①", meaning: "教具；教学用品", reading: "きょうぐ" },
+{ word: "引く⓪", meaning: "引起；拉；拽；牵引", reading: "ひく" },
+{ word: "並ぶ⓪", meaning: "排列；排；摆满；比得上", reading: "ならぶ" },
+{ word: "わけ①", meaning: "原因；理由", reading: "わけ" },
+{ word: "もと（下）②", meaning: "下面；～之下", reading: "もと" },
+{ word: "学友⓪", meaning: "学友；同学；校友", reading: "がくゆう" },
+{ word: "角度①", meaning: "角度；观点；立场", reading: "かくど" },
+{ word: "学ぶ⓪", meaning: "学习", reading: "まなぶ" },
+{ word: "主役⓪", meaning: "（影、剧）主角；（转）主要人物", reading: "しゅやく" },
+{ word: "あくまで（飽くまで）②①", meaning: "始终；到底", reading: "あくまで" },
+{ word: "講義①", meaning: "讲授；讲解；讲义；课", reading: "こうぎ" },
+{ word: "一方的⓪", meaning: "单方面的；一方面的", reading: "いっぽうてき" },
+{ word: "討論①", meaning: "讨论", reading: "とうろん" },
+{ word: "手助け②", meaning: "帮助；帮", reading: "てだすけ" },
+{ word: "役②", meaning: "角色；任务；工作", reading: "やく" },
+{ word: "務める③", meaning: "担任；扮演；做", reading: "つとめる" },
+{ word: "養う⓪③", meaning: "培养；抚养", reading: "やしなう" },
+{ word: "単に①", meaning: "只；仅；单", reading: "たんに" },
+{ word: "締めくくり⓪", meaning: "总结；结束（締め括り•しめくくり）", reading: "しめくくり" },
+{ word: "ふさわしい【相応しい】④", meaning: "适合（的）；相称（的）；般配（的）", reading: "ふさわしい" }
+                ],
+                "レッスン2": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
+                "レッスン3": [
+                    { word: "仕事", meaning: "工作", reading: "しごと" },
+                    { word: "医者", meaning: "医生", reading: "いしゃ" },
+                    { word: "教師", meaning: "教师", reading: "きょうし" }
+                ]
+            },
+            "zhry4": {
                 "レッスン1": [
                     { word: "動物", meaning: "动物", reading: "どうぶつ" },
                     { word: "猫", meaning: "猫", reading: "ねこ" },
@@ -1193,6 +1252,7 @@ color: #333; /* 深色文字保证可读性 */
                     { word: "教師", meaning: "教师", reading: "きょうし" }
                 ]
             }
+
         };
 
         let vocabulary = JSON.parse(JSON.stringify(defaultVocabulary));
@@ -1257,8 +1317,8 @@ color: #333; /* 深色文字保证可读性 */
             const levelSelect = document.getElementById('user-level');
             levelSelect.innerHTML = '';
             
-            const levels = ['beginner', 'intermediate', 'advanced'];
-            const levelNames = ['初級', '中級', '上級'];
+            const levels = ['zhry1', 'zhry2', 'zhry3', 'zhry4'];
+            const levelNames = ['総合日語1', '総合日語2', '総合日語3', '総合日語4'];
             
             for (let i = 0; i < levels.length; i++) {
                 const option = document.createElement('option');
@@ -1676,10 +1736,11 @@ color: #333; /* 深色文字保证可读性 */
 
         function getLevelText(level) {
             switch(level) {
-                case 'beginner': return '初級';
-                case 'intermediate': return '中級';
-                case 'advanced': return '上級';
-                default: return '';
+                case 'zhry1': return '総合日語1';
+                case 'zhry2': return '総合日語2';
+                case 'zhry3': return '総合日語3';
+                  case 'zhry4': return '総合日語4';
+　　　　　default: return '';
             }
         }
 
