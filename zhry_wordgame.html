@@ -56,13 +56,15 @@
 
         .header {
             text-align: center;
-            margin-bottom: 0px;
+            margin-bottom: 0px;/* 减少底部外边距，让标题更靠上 */
             position: relative;
+            margin-top: 0; /* 确保标题顶部没有额外间距 */
+            margin-top: 5px; /* 向上移动整个header */
         }
 
         h1 {
             color: var(--sakura-dark-pink);
-            margin-bottom: 5px;
+            margin-bottom: -5px;
             font-size: 3rem;
             text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
             display: inline-block;
@@ -76,6 +78,7 @@
             color: transparent;
             animation: rainbow 8s ease infinite;
             font-family: 'Meiryo', sans-serif; 
+            margin-top: 0; /* 确保标题顶部没有额外间距 */
         }
 
         @keyframes rainbow {
@@ -87,7 +90,12 @@
         .copyright {
             color: var(--light-text);
             font-size: 14px;
-            margin-bottom: 5px;
+            margin-bottom: -5px;
+            display: inline-block;
+            margin-left: 5px;
+            vertical-align: bottom;
+            position: relative;
+            top: -18px;
         }
 
         .user-info-row {
@@ -375,9 +383,9 @@
         /* 确认按钮 */
 .confirm-btn, .clear-btn, .exit-btn {
     display: inline-block;
-    width: 120px; /* 统一宽度 */
+    width: 140px; /* 统一宽度 */
     font-size: 18px;
-    padding: 10px 0; /* 统一内边距 */
+    padding: 16px 0; /* 统一内边距 */
     text-align: center;
     margin: 0;
 }
@@ -458,21 +466,27 @@ color: #333; /* 深色文字保证可读性 */
                 font-size: 14px;
                 padding: 8px 15px;
             }
+
+            .copyright {
+                display: block;
+                margin-left: 0;
+                margin-top: 5px;
+                top: 0;
+            }
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>日本語単語ゲーム</h1>
-        <div class="copyright">@SJTU YuYang</div>
+        <h1>日本語単語ゲーム</h1><div class="copyright">@SJTU YuYang</div>
         <div class="user-info-row">
             <div class="user-info-item">
                 <label for="username">ユーザー名:</label>
-                <input type="text" id="username" placeholder="名前" style="width: 100px;">
+                <input type="text" id="username" placeholder="名前" style="width: 120px;">
             </div>
             <div class="user-info-item">
                 <label for="user-level">レベル:</label>
-                <select id="user-level" style="width: 80px;">
+                <select id="user-level" style="width: 150px;">
                     <option value="zhry1">総合日語1</option>
                     <option value="zhry2">総合日語2</option>
                     <option value="zhry3">総合日語3</option>
@@ -481,7 +495,7 @@ color: #333; /* 深色文字保证可读性 */
             </div>
             <div class="user-info-item">
                 <label for="lesson-select">レッスン:</label>
-                <select id="lesson-select" style="width: 120px;" disabled></select>
+                <select id="lesson-select" style="width: 150px;" disabled></select>
             </div>
             <button id="start-btn">スタート</button>
         </div>
@@ -1179,9 +1193,21 @@ color: #333; /* 深色文字保证可读性 */
         },
             "zhry3": {
                "L1-U1Text": [
-                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
-                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
-                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" } 
+{ word: "演習室③", meaning: "研究讨论室；教室", reading: "えんしゅうしつ" },
+{ word: "見える②", meaning: "（「来る」的尊敬表达）来；到；光临；抵达", reading: "みえる" },
+{ word: "レジュメ⓪", meaning: "提纲（法语résumé）", reading: "レジュメ" },
+{ word: "ノック①", meaning: "敲；轻叩（knock）", reading: "ノック" },
+{ word: "あの⓪", meaning: "请问；啊", reading: "あの" },
+{ word: "今学期③", meaning: "本学期；这学期", reading: "こんがっき" },
+{ word: "申す①", meaning: "（「言う」的自谦说法）说；叫做，称作", reading: "もうす" },
+{ word: "歓迎会③⓪", meaning: "欢迎会", reading: "かんげいかい" },
+{ word: "張り切る③", meaning: "兴奋；干劲十足；紧张", reading: "はりきる" },
+{ word: "年少者③", meaning: "少年；年纪轻者（未成年人）", reading: "ねんしょうしゃ" },
+{ word: "テニス部③", meaning: "网球俱乐部；网球队", reading: "テニスぶ" },
+{ word: "副部長③", meaning: "副部长", reading: "ふくぶちょう" },
+{ word: "アモイ①", meaning: "（地名）厦门（葡萄牙语Amoy）", reading: "アモイ" },
+{ word: "卒論⓪", meaning: "（本科）毕业论文", reading: "そつろん" },
+{ word: "おっちょこちょい⑤", meaning: "不稳重；轻浮；马虎", reading: "おっちょこちょい" }
                      ],
                "L1-U2Text": [
 { word: "本学①", meaning: "本校（专指大学）", reading: "ほんがく" },
@@ -1224,15 +1250,89 @@ color: #333; /* 深色文字保证可读性 */
 { word: "締めくくり⓪", meaning: "总结；结束（締め括り•しめくくり）", reading: "しめくくり" },
 { word: "ふさわしい【相応しい】④", meaning: "适合（的）；相称（的）；般配（的）", reading: "ふさわしい" }
                 ],
+                "L2-U1Text": [
+{ word: "おす①", meaning: "（用于年轻男性之间打招呼）你好", reading: "おす" },
+{ word: "空手着⓪", meaning: "空手道服", reading: "からてぎ" },
+{ word: "カンフー①", meaning: "功夫；中国武术（Kungfu）", reading: "カンフー" },
+{ word: "香港①", meaning: "（地名）香港", reading: "ホンコン" },
+{ word: "映画スター⑤", meaning: "电影明星", reading: "えいがスター" },
+{ word: "太極拳③④", meaning: "太极拳", reading: "たいきょくけん" },
+{ word: "型②", meaning: "（技艺、运动等传统的）形式；样式；型", reading: "かた" },
+{ word: "オッケー①", meaning: "（表示同意）好；可以（OK）", reading: "オッケー" },
+{ word: "まいった②①", meaning: "行吧！好吧！糟糕！", reading: "まいった" },
+{ word: "のぞく〖覗く〗⓪", meaning: "瞅；稍微看看；瞧瞧；窥视", reading: "のぞく" },
+{ word: "不承不承④", meaning: "不情愿；勉勉强强", reading: "ふしょうぶしょう" },
+{ word: "承諾⓪", meaning: "答应；承诺；允许", reading: "しょうだく" }
+                ],
+                "L2-U2Text": [
+{ word: "モットー①", meaning: "宗旨；口号；座右铭（motto）", reading: "モットー" },
+{ word: "何より①⓪", meaning: "比什么（都好）；最好", reading: "なにより" },
+{ word: "合同⓪", meaning: "共同；联合；合并", reading: "ごうどう" },
+{ word: "程度①⓪", meaning: "程度", reading: "ていど" },
+{ word: "連絡先⓪", meaning: "联系人；联系单位；联系地点", reading: "れんらくさき" },
+{ word: "～先", meaning: "～处；～地；～地点", reading: "～さき" },
+{ word: "初心者②", meaning: "第一次做～的人", reading: "しょしんしゃ" },
+{ word: "求む②", meaning: "寻求；希望", reading: "もとむ" },
+{ word: "団体戦⓪", meaning: "团体赛", reading: "だんたいせん" },
+{ word: "団体⓪", meaning: "团体；集体", reading: "だんたい" },
+{ word: "～戦", meaning: "～之战；～的比赛", reading: "～せん" },
+{ word: "目標⓪", meaning: "目标", reading: "もくひょう" },
+{ word: "稽古①", meaning: "学习；练习；排练；功夫", reading: "けいこ" },
+{ word: "鍛える③", meaning: "锻炼", reading: "きたえる" },
+{ word: "未経験者④", meaning: "没有经验的人", reading: "みけいけんしゃ" },
+{ word: "未～", meaning: "没有～；未～", reading: "み～" },
+{ word: "マネージャー②⓪①", meaning: "管理人；干事；经纪人；助理（manager）", reading: "マネージャー" },
+{ word: "武道場⓪", meaning: "武馆；练武场", reading: "ぶどうじょう" },
+{ word: "手話①", meaning: "手语；哑语", reading: "しゅわ" },
+{ word: "こだま⓪", meaning: "回声", reading: "こだま" },
+{ word: "後期①", meaning: "下学期；后期；后半期", reading: "こうき" },
+{ word: "機①", meaning: "机会；时机", reading: "き" },
+{ word: "南講義棟④", meaning: "南教学楼", reading: "みなみこうぎとう" },
+{ word: "～棟", meaning: "（表示大型房屋建筑）～楼；～栋", reading: "～とう" },
+{ word: "マイク·ジェイソン④", meaning: "（人名）迈克·杰森（Mike Jason）", reading: "マイク·ジェイソン" },
+{ word: "とまどう【戸惑う】③", meaning: "不知所措；犹豫不决；徘徊", reading: "とまどう" },
+{ word: "勇気①", meaning: "勇气", reading: "ゆうき" },
+{ word: "得る①", meaning: "得到", reading: "える" }
+                ],
+                "L3-U1Text": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
+                "L3-U2Text": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
+                "L4-U1Text": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
+                "L4-U2Text": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
                 "レッスン2": [
                     { word: "趣味", meaning: "爱好", reading: "しゅみ" },
                     { word: "音楽", meaning: "音乐", reading: "おんがく" },
                     { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
                 ],
-                "レッスン3": [
-                    { word: "仕事", meaning: "工作", reading: "しごと" },
-                    { word: "医者", meaning: "医生", reading: "いしゃ" },
-                    { word: "教師", meaning: "教师", reading: "きょうし" }
+                "レッスン2": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
+                "レッスン2": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+                ],
+                "レッスン2": [
+                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
+                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
+                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
                 ]
             },
             "zhry4": {
