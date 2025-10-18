@@ -184,13 +184,21 @@
         .kana-btn {
             font-size: 20px;
             padding: 10px 15px;
-            background-color: #FFE8D1; /* 改为浅杏色 */
+            background-color: #FFE8D1; /* 改为浅为浅杏色 */
             color: #5A3921; /* 深棕色文字保证对比度 */
             border: 1px solid #E6C9A0; /* 添加浅杏色边框 */
             border-radius: 6px;
             cursor: pointer;
             transition: all 0.2s;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* 小や、ゆ、よ按钮的特殊样式 */
+        .small-yakana-btn {
+            background-color: #FFE5EC; /* 浅粉色背景 */
+            border: 1px solid #FFB6C1; /* 粉色边框 */
+            font-weight: bold;
+            color: #D81B60; /* 深粉色文字 */
         }
 
         .kana-btn:hover {
@@ -473,7 +481,45 @@ color: #333; /* 深色文字保证可读性 */
                 margin-top: 5px;
                 top: 0;
             }
+        
+.hidden-word {
+            color: transparent !important;
+            text-shadow: 0 0 8px rgba(255, 92, 141, 0.5) !important;
+            background: linear-gradient(45deg, #ff5c8d, #e8436d) !important;
+            -webkit-background-clip: text !important;
+            background-clip: text !important;
+            position: relative;
         }
+
+        .hidden-word::after {
+            content: "???";
+            position: absolute;
+            left: 0;
+            top: 0;
+            color: var(--sakura-dark-pink);
+            text-shadow: none;
+            background: none;
+        }
+
+        .correct-word {
+            color: var(--sakura-dark-pink);
+            font-size: 32px;
+            font-weight: bold;
+            text-align: center;
+            margin: 10px 0;
+            animation: fadeIn 0.5s ease-in;
+        }
+@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-feedback {
+            text-align: center;
+            margin: 15px 0;
+            min-height: 80px;
+        }
+
     </style>
 </head>
 <body>
@@ -618,7 +664,7 @@ color: #333; /* 深色文字保证可读性 */
 {word: "ヘア", meaning: "头发", reading: "ヘア"}
                 ],
                 "L7-U2Ex": [
-{word: "人形", meaning: "人偶", reading: "にんぎょう"}, 
+{word: "人形", meaning: "人偶偶", reading: "にんぎょう"}, 
 {word: "城", meaning: "城堡", reading: "しろ"}, 
 {word: "アイスクリーム", meaning: "冰淇淋", reading: "アイスクリーム"}, 
 {word: "春", meaning: "春天", reading: "はる"}, 
@@ -630,7 +676,7 @@ color: #333; /* 深色文字保证可读性 */
 {word: "学力", meaning: "学习能力", reading: "がくりょく"}
                 ],
                 "L7-U3Text": [
-{word: "鳥獣戯画", meaning: "鸟兽人物讽刺画", reading: "ちょうじゅうぎが"}, 
+{word: "鳥獣戯画", meaning: "鸟兽人物讽刺刺画", reading: "ちょうじゅうぎが"}, 
 {word: "参考", meaning: "参考", reading: "さんこう"}, 
 {word: "絵巻", meaning: "画卷", reading: "えまき"}, 
 {word: "ほど", meaning: "程度；限度", reading: "ほど"}, 
@@ -662,14 +708,14 @@ color: #333; /* 深色文字保证可读性 */
 {word: "犯人", meaning: "犯人", reading: "はんにん"}, 
 {word: "仲間", meaning: "伙伴", reading: "なかま"}, 
 {word: "倒す", meaning: "打倒", reading: "たおす"}, 
-{word: "追いかける", meaning: "追赶", reading: "おいかける"}, 
+{word: "追いかける", meaning: "追赶", reading: "おいかかける"}, 
 {word: "投げ飛ばす", meaning: "扔出去", reading: "なげとばす"}, 
 {word: "場面", meaning: "场景", reading: "ばめん"}, 
 {word: "コマ割り", meaning: "分格", reading: "こまわり"}, 
 {word: "流れ", meaning: "流程", reading: "ながれ"}, 
 {word: "展開", meaning: "展开", reading: "てんかい"}, 
 {word: "小さな", meaning: "小的", reading: "ちいさな"}, 
-{word: "爽快感", meaning: "爽快感", reading: "そうかいかん"}, 
+{word: "爽快感快感", meaning: "爽快感", reading: "そうかいかん"}, 
 {word: "爽快", meaning: "爽快的", reading: "そうかい"}, 
 {word: "-感", meaning: "感；感觉", reading: "-かん"}, 
 {word: "呼び起こす", meaning: "叫醒；唤起", reading: "よびおこす"}, 
@@ -679,7 +725,7 @@ color: #333; /* 深色文字保证可读性 */
 {word: "鷹", meaning: "鹰", reading: "たか"}, 
 {word: "象", meaning: "大象", reading: "ぞう"}, 
 {word: "生息", meaning: "栖息", reading: "せいそく"}, 
-{word: "麒麟", meaning: "（中国古代神话中的形象）麒麟；日语中指长颈鹿", reading: "きりん"}, 
+{word: "麒麟", meaning: "（中国古代神话中的形象）麒麟；日语中指指长颈鹿", reading: "きりん"}, 
 {word: "龍", meaning: "龙", reading: "りゅう"}, 
 {word: "空想", meaning: "空想", reading: "くうそう"}, 
 {word: "上", meaning: "在...方面", reading: "じょう"}, 
@@ -688,24 +734,24 @@ color: #333; /* 深色文字保证可读性 */
 {word: "人物", meaning: "人物", reading: "じんぶつ"}, 
 {word: "老尼", meaning: "老尼姑", reading: "ろうに"}, 
 {word: "僧", meaning: "僧人", reading: "そう"}, 
-{word: "首引き", meaning: "日本狂言曲名", reading: "くびひき"}, 
+{word: "首引引き", meaning: "日本狂言曲名", reading: "くびひき"}, 
 {word: "弱い", meaning: "弱的", reading: "よわい"}, 
 {word: "優勢", meaning: "优势", reading: "ゆうせい"}, 
 {word: "尼", meaning: "尼姑", reading: "あま"}, 
 {word: "擬人化", meaning: "拟人化", reading: "ぎじんか"}, 
 {word: "擬人", meaning: "拟人", reading: "ぎじん"}, 
 {word: "ふんどし", meaning: "兜裆布", reading: "ふんどし"}, 
-{word: "姿", meaning: "姿态；样子；装束", reading: "すがた"}, 
+{word: "姿", meaning: "姿态；样子；装束", reading: "すががた"}, 
 {word: "綱", meaning: "粗绳；绳索", reading: "つな"}, 
 {word: "大転倒", meaning: "严重跌倒", reading: "おおてんとう"}, 
-{word: "最古", meaning: "最早；最古老", reading: "さいこ"}, 
-{word: "通す", meaning: "通过；穿过", reading: "とおす"}, 
+{word: "最古", meaning: "最早早；最古老", reading: "さいこ"}, 
+{word: "通す", meaning: "通过；穿过过", reading: "とおす"}, 
 {word: "ユーモア", meaning: "幽默", reading: "ユーモア"}, 
-{word: "色彩", meaning: "色彩；倾向", reading: "しきさい"}, 
+{word: "色彩", meaning: "色彩；倾向向", reading: "しききさい"}, 
 {word: "掴む", meaning: "抓住；得到", reading: "つかむ"}, 
 {word: "不思議", meaning: "不可思议；奇怪", reading: "ふしぎ"}, 
 {word: "魅力", meaning: "吸引力；魅力", reading: "みりょく"}, 
-{word: "キャラクター", meaning: "性格；形象；特质；角色；人设", reading: "キャラクター"}, 
+{word: "キャラクター", meaning: "性格；形象；特质质；角色；人设", reading: "キャラクター"}, 
 {word: "価値観", meaning: "价值观", reading: "かちかん"}, 
 {word: "結び付ける", meaning: "结合；联系；拴上", reading: "むすびつける"}
                 ],
@@ -716,12 +762,12 @@ color: #333; /* 深色文字保证可读性 */
 {word: "西郷隆盛", meaning: "西郷隆盛", reading: "さいごうたかもり"}, 
 {word: "幕末", meaning: "幕府末期", reading: "ばくまつ"}, 
 {word: "明治", meaning: "明治时期", reading: "めいじ"}, 
-{word: "産む", meaning: "生（孩子）；得出；产出", reading: "うむ"}, 
+{word: "産む", meaning: "生（孩子）；得出出；产出", reading: "うむ"}, 
 {word: "関東", meaning: "关东地区", reading: "かんとう"}, 
-{word: "東北", meaning: "东北地区", reading: "とうほく"}, 
+{word: "東北", meaning: "东北地区", reading: "とううほく"}, 
 {word: "雨雲", meaning: "雨云；阴云", reading: "あまぐも"}, 
-{word: "およそ", meaning: "大约；大概", reading: "およそ"}, 
-{word: "トレーニング", meaning: "训练；锻炼；练习", reading: "トレーニング"}, 
+{word: "およそ", meaning: "大约；大概", reading: "およよそ"}, 
+{word: "トレーニング", meaning: "训练；锻炼炼；练习", reading: "トレーニング"}, 
 {word: "乗り越える", meaning: "跨过；超过", reading: "のりこえる"}, 
 {word: "生放送", meaning: "现场直播", reading: "なまほうそう"}, 
 {word: "終了", meaning: "结束", reading: "しゅうりょう"}, 
@@ -851,7 +897,7 @@ color: #333; /* 深色文字保证可读性 */
 {word: "けれど", meaning: "可是；不过", reading: "けれど"},
 {word: "航空券", meaning: "飞机票", reading: "こうくうけん"},
 {word: "キャンセル", meaning: "取消(预约、活动等)", reading: "キャンセル"},
-{word: "  ", meaning: "终于；好不容易", reading: "やっと"},
+{word: "やっと", meaning: "终于；好不容易", reading: "やっと"},
 {word: "毎年", meaning: "毎年", reading: "まいとし"},
 {word: "時期", meaning: "时期", reading: "じき"},
 {word: "娘", meaning: "女儿；年轻姑娘", reading: "むすめ"},
@@ -861,7 +907,7 @@ color: #333; /* 深色文字保证可读性 */
                 "L9-U1Ex": [
 {word: "プラン", meaning: "计划", reading: "プラン"},
 {word: "ハイキング", meaning: "徒步旅行", reading: "ハイキング"},
-{word: "  ", meaning: "终于，总算是", reading: "ついに"},
+{word: "ついに", meaning: "终于，总算是", reading: "ついに"},
 {word: "憧れ", meaning: "憧憬；向往", reading: "あこがれ"},
 {word: "始発", meaning: "始发；头班车", reading: "しはつ"},
 {word: "感動", meaning: "感动", reading: "かんどう"},
@@ -882,7 +928,7 @@ color: #333; /* 深色文字保证可读性 */
 {word: "お祝い", meaning: "（「祝い」的尊敬说法)祝贺; 庆祝; 贺礼", reading: "おいわい"},
 {word: "親孝行", meaning: "孝顺父母", reading: "おやこうこう"},
 {word: "半年", meaning: "半年", reading: "はんとし"},
-{word: "　　", meaning: "全，全是，净是，大约", reading: "ばかり"}
+{word: "ばかり", meaning: "全，全是，净是，大约", reading: "ばかり"}
                 ],
                 "L9-U2Ex": [
 {word: "コンクール", meaning: "比赛", reading: "コンクール"},
@@ -915,16 +961,16 @@ color: #333; /* 深色文字保证可读性 */
 {word: "戦線", meaning: "战线", reading: "せんせん"},
 {word: "数年", meaning: "数年；几年", reading: "すうねん"},
 {word: "首都圏", meaning: "首都圏(包括东京都及其周边的七个县)", reading: "しゅとけん"},
-{word: "  ", meaning: "所谓", reading: "いわゆる"},
+{word: "いわゆる", meaning: "所谓", reading: "いわゆる"},
 {word: "メリット", meaning: "好处；长处；优点", reading: "メリット"},
 {word: "前者", meaning: "前者", reading: "ぜんしゃ"},
 {word: "後者", meaning: "后者", reading: "こうしゃ"},
-{word: "  ", meaning: "悠闲；舒适", reading: "のんびり"},
+{word: "のんびり", meaning: "悠闲；舒适", reading: "のんびり"},
 {word: "都会", meaning: "都市；城市", reading: "とかい"},
 {word: "上京", meaning: "去京城；去首都；进京", reading: "じょうきょう"},
 {word: "新鮮", meaning: "新鲜", reading: "しんせん"},
-{word: "　　", meaning: "反而", reading: "かえって"},
-{word: "　　", meaning: "安闲；闲适", reading: "ゆったり"},
+{word: "かえって", meaning: "反而", reading: "かえって"},
+{word: "ゆったり", meaning: "安闲；闲适", reading: "ゆったり"},
 {word: "量", meaning: "量；数量", reading: "りょう"},
 {word: "入手", meaning: "到手；获得", reading: "にゅうしゅ"},
 {word: "活性化", meaning: "激活；搞活；复兴；发展", reading: "かっせいか"},
@@ -994,7 +1040,7 @@ color: #333; /* 深色文字保证可读性 */
 { word:  "粘り強い", meaning:  "坚韧(的)；有耐心(的)", reading:  "ねばりづよい"},
 { word:  "包容力", meaning:  "包容力；包容的能力", reading:  "ほうようりょく"},
 { word:  "包容", meaning:  "包容", reading:  "ほうよう"},
-{ word:  "-力", meaning:  "~力", reading:  "－りょく"},
+{ word:  "-力", meaning:  "~力", reading:  "~りょく"},
 { word:  "信用", meaning:  "信用；相信；信任", reading:  "しんよう"},
 { word:  "社交", meaning:  "社交", reading:  "しゃこう"},
 { word:  "愛想", meaning:  "态度；好心；善意", reading:  "あいそ"},
@@ -1077,7 +1123,7 @@ color: #333; /* 深色文字保证可读性 */
   "L11-U1Text": [
 {word: "試す", meaning: "试验；尝试", reading: "ためす"},
 {word: "さえ", meaning: "连；甚至", reading: "さえ"},
-{word: "-代", meaning: "~费用；（世代）辈；年龄、年代的范围", reading: "-だい"}
+{word: "~代", meaning: "~费用；（世代）辈；年龄、年代的范围", reading: "~だい"}
  ],
   "L11-U1Ex": [
 {word: "気になる", meaning: "担心；忧虑；介意", reading: "きになる"},
@@ -1088,10 +1134,8 @@ color: #333; /* 深色文字保证可读性 */
 {word: "生き物", meaning: "生物；有生命的事物", reading: "いきもの"}
   ],
   "L11-U2Text": [
-{word: "丸井", meaning: "（姓氏）丸井", reading: "まるい"},
 {word: "わたくし", meaning: "（第一人称代词）我", reading: "わたくし"},
 {word: "人事", meaning: "人事", reading: "じんじ"},
-{word: "いらしてください", meaning: "请您来一趟（意同「いらっしゃってください」，也是一种尊敬的表达方式。）", reading: "いらしてください"},
 {word: "限る", meaning: "限；限制；限于", reading: "かぎる"}
  ],
   "L11-U2Ex": [
@@ -1179,7 +1223,7 @@ color: #333; /* 深色文字保证可读性 */
 {word: "先入観", meaning: "成见；先入为主", reading: "せんにゅうかん" }
   ],
   "L12-U3Text": [
-{word: "-観", meaning: "~观", reading: "－かん" },
+{word: "~観", meaning: "~观", reading: "~かん" },
 {word: "けれども", meaning: "可是；但是", reading: "けれども" },
 {word: "熱気", meaning: "高涨的热情；热烈的气氛", reading: "ねっき" },
 {word: "興奮", meaning: "兴奋", reading: "こうふん" },
@@ -1195,17 +1239,12 @@ color: #333; /* 深色文字保证可读性 */
                "L1-U1Text": [
 { word: "演習室③", meaning: "研究讨论室；教室", reading: "えんしゅうしつ" },
 { word: "見える②", meaning: "（「来る」的尊敬表达）来；到；光临；抵达", reading: "みえる" },
-{ word: "レジュメ⓪", meaning: "提纲（法语résumé）", reading: "レジュメ" },
-{ word: "ノック①", meaning: "敲；轻叩（knock）", reading: "ノック" },
-{ word: "あの⓪", meaning: "请问；啊", reading: "あの" },
 { word: "今学期③", meaning: "本学期；这学期", reading: "こんがっき" },
 { word: "申す①", meaning: "（「言う」的自谦说法）说；叫做，称作", reading: "もうす" },
 { word: "歓迎会③⓪", meaning: "欢迎会", reading: "かんげいかい" },
 { word: "張り切る③", meaning: "兴奋；干劲十足；紧张", reading: "はりきる" },
 { word: "年少者③", meaning: "少年；年纪轻者（未成年人）", reading: "ねんしょうしゃ" },
-{ word: "テニス部③", meaning: "网球俱乐部；网球队", reading: "テニスぶ" },
 { word: "副部長③", meaning: "副部长", reading: "ふくぶちょう" },
-{ word: "アモイ①", meaning: "（地名）厦门（葡萄牙语Amoy）", reading: "アモイ" },
 { word: "卒論⓪", meaning: "（本科）毕业论文", reading: "そつろん" },
 { word: "おっちょこちょい⑤", meaning: "不稳重；轻浮；马虎", reading: "おっちょこちょい" }
                      ],
@@ -1217,7 +1256,6 @@ color: #333; /* 深色文字保证可读性 */
 { word: "必修⓪", meaning: "必修；必选", reading: "ひっしゅう" },
 { word: "概して①", meaning: "一般；大体；大概", reading: "がいして" },
 { word: "時間帯⓪", meaning: "时间带；时间段", reading: "じかんたい" },
-{ word: "まかす（任す）②", meaning: "交给；听任；任凭", reading: "まかす" },
 { word: "作業①", meaning: "作业；操作", reading: "さぎょう" },
 { word: "自主性⓪", meaning: "自主性", reading: "じしゅせい" },
 { word: "自主①", meaning: "自主；独立自主；主动", reading: "じしゅ" },
@@ -1232,13 +1270,10 @@ color: #333; /* 深色文字保证可读性 */
 { word: "教具①", meaning: "教具；教学用品", reading: "きょうぐ" },
 { word: "引く⓪", meaning: "引起；拉；拽；牵引", reading: "ひく" },
 { word: "並ぶ⓪", meaning: "排列；排；摆满；比得上", reading: "ならぶ" },
-{ word: "わけ①", meaning: "原因；理由", reading: "わけ" },
-{ word: "もと（下）②", meaning: "下面；～之下", reading: "もと" },
 { word: "学友⓪", meaning: "学友；同学；校友", reading: "がくゆう" },
 { word: "角度①", meaning: "角度；观点；立场", reading: "かくど" },
 { word: "学ぶ⓪", meaning: "学习", reading: "まなぶ" },
 { word: "主役⓪", meaning: "（影、剧）主角；（转）主要人物", reading: "しゅやく" },
-{ word: "あくまで（飽くまで）②①", meaning: "始终；到底", reading: "あくまで" },
 { word: "講義①", meaning: "讲授；讲解；讲义；课", reading: "こうぎ" },
 { word: "一方的⓪", meaning: "单方面的；一方面的", reading: "いっぽうてき" },
 { word: "討論①", meaning: "讨论", reading: "とうろん" },
@@ -1247,62 +1282,122 @@ color: #333; /* 深色文字保证可读性 */
 { word: "務める③", meaning: "担任；扮演；做", reading: "つとめる" },
 { word: "養う⓪③", meaning: "培养；抚养", reading: "やしなう" },
 { word: "単に①", meaning: "只；仅；单", reading: "たんに" },
-{ word: "締めくくり⓪", meaning: "总结；结束（締め括り•しめくくり）", reading: "しめくくり" },
-{ word: "ふさわしい【相応しい】④", meaning: "适合（的）；相称（的）；般配（的）", reading: "ふさわしい" }
+{ word: "締めくくり⓪", meaning: "总结；结束（締め括り•しめくくり）", reading: "しめくくり" }
                 ],
                 "L2-U1Text": [
-{ word: "おす①", meaning: "（用于年轻男性之间打招呼）你好", reading: "おす" },
 { word: "空手着⓪", meaning: "空手道服", reading: "からてぎ" },
-{ word: "カンフー①", meaning: "功夫；中国武术（Kungfu）", reading: "カンフー" },
-{ word: "香港①", meaning: "（地名）香港", reading: "ホンコン" },
-{ word: "映画スター⑤", meaning: "电影明星", reading: "えいがスター" },
 { word: "太極拳③④", meaning: "太极拳", reading: "たいきょくけん" },
 { word: "型②", meaning: "（技艺、运动等传统的）形式；样式；型", reading: "かた" },
-{ word: "オッケー①", meaning: "（表示同意）好；可以（OK）", reading: "オッケー" },
-{ word: "まいった②①", meaning: "行吧！好吧！糟糕！", reading: "まいった" },
-{ word: "のぞく〖覗く〗⓪", meaning: "瞅；稍微看看；瞧瞧；窥视", reading: "のぞく" },
 { word: "不承不承④", meaning: "不情愿；勉勉强强", reading: "ふしょうぶしょう" },
 { word: "承諾⓪", meaning: "答应；承诺；允许", reading: "しょうだく" }
                 ],
                 "L2-U2Text": [
-{ word: "モットー①", meaning: "宗旨；口号；座右铭（motto）", reading: "モットー" },
 { word: "何より①⓪", meaning: "比什么（都好）；最好", reading: "なにより" },
 { word: "合同⓪", meaning: "共同；联合；合并", reading: "ごうどう" },
 { word: "程度①⓪", meaning: "程度", reading: "ていど" },
 { word: "連絡先⓪", meaning: "联系人；联系单位；联系地点", reading: "れんらくさき" },
-{ word: "～先", meaning: "～处；～地；～地点", reading: "～さき" },
 { word: "初心者②", meaning: "第一次做～的人", reading: "しょしんしゃ" },
 { word: "求む②", meaning: "寻求；希望", reading: "もとむ" },
 { word: "団体戦⓪", meaning: "团体赛", reading: "だんたいせん" },
 { word: "団体⓪", meaning: "团体；集体", reading: "だんたい" },
-{ word: "～戦", meaning: "～之战；～的比赛", reading: "～せん" },
 { word: "目標⓪", meaning: "目标", reading: "もくひょう" },
 { word: "稽古①", meaning: "学习；练习；排练；功夫", reading: "けいこ" },
 { word: "鍛える③", meaning: "锻炼", reading: "きたえる" },
 { word: "未経験者④", meaning: "没有经验的人", reading: "みけいけんしゃ" },
 { word: "未～", meaning: "没有～；未～", reading: "み～" },
-{ word: "マネージャー②⓪①", meaning: "管理人；干事；经纪人；助理（manager）", reading: "マネージャー" },
 { word: "武道場⓪", meaning: "武馆；练武场", reading: "ぶどうじょう" },
 { word: "手話①", meaning: "手语；哑语", reading: "しゅわ" },
-{ word: "こだま⓪", meaning: "回声", reading: "こだま" },
 { word: "後期①", meaning: "下学期；后期；后半期", reading: "こうき" },
 { word: "機①", meaning: "机会；时机", reading: "き" },
 { word: "南講義棟④", meaning: "南教学楼", reading: "みなみこうぎとう" },
-{ word: "～棟", meaning: "（表示大型房屋建筑）～楼；～栋", reading: "～とう" },
-{ word: "マイク·ジェイソン④", meaning: "（人名）迈克·杰森（Mike Jason）", reading: "マイク·ジェイソン" },
-{ word: "とまどう【戸惑う】③", meaning: "不知所措；犹豫不决；徘徊", reading: "とまどう" },
 { word: "勇気①", meaning: "勇气", reading: "ゆうき" },
 { word: "得る①", meaning: "得到", reading: "える" }
                 ],
                 "L3-U1Text": [
-                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
-                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
-                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
-                ],
+  { word: "大相撲③", meaning: "职业相扑比赛", reading: "おおずもう" },
+{ word: "大～", meaning: "大～", reading: "おお～" },
+{ word: "はっけよい①", meaning: "（相扑）（两者对峙时，裁判的喊声）好；加油", reading: "はっけよい" },
+{ word: "両国（地名）⓪", meaning: "两国", reading: "りょうごく" },
+{ word: "国技館③②", meaning: "国技馆；相扑体育馆", reading: "こくぎかん" },
+{ word: "力士①⓪", meaning: "力士（相扑运动员）", reading: "りきし" },
+{ word: "ハワイ①", meaning: "（地名）夏威夷（Hawaii）", reading: "ハワイ" },
+{ word: "モンゴル①", meaning: "（国名）蒙古（Mongol）", reading: "モンゴル" },
+{ word: "勝つ①", meaning: "战胜；获胜；克制；占优势", reading: "かつ" },
+{ word: "遠慮⓪", meaning: "客气；拘谨；回避", reading: "えんりょ" },
+{ word: "さすが⓪", meaning: "的确，确实；不愧～", reading: "さすが" },
+{ word: "とんでもない⑤", meaning: "（强烈否定对方的说法）哪里的话", reading: "とんでもない" },
+{ word: "精一杯④", meaning: "尽力；全力以赴", reading: "せいいっぱい" },
+{ word: "いよいよ②", meaning: "终于；总算是", reading: "いよいよ" },
+{ word: "横綱⓪", meaning: "（日本相扑运动员资格最高级）横纲；【转】首屈一指者", reading: "よこづな" },
+{ word: "ハラハラ①", meaning: "非常担心；捏一把汗；（树叶、眼泪等）扑簌下落貌", reading: "ハラハラ" },
+{ word: "たしかに（確かに）①", meaning: "的确；确实", reading: "たしかに" },
+{ word: "まあまあ①-①", meaning: "（表示抚慰或催促）好了好了；行了", reading: "まあまあ" },
+{ word: "国技①②", meaning: "国技；一个国家的传统武术武术、技艺、运动等", reading: "こくぎ" }
+    ],
                 "L3-U2Text": [
-                    { word: "趣味", meaning: "爱好", reading: "しゅみ" },
-                    { word: "音楽", meaning: "音乐", reading: "おんがく" },
-                    { word: "スポーツ", meaning: "运动", reading: "スポーツ" }
+{ word: "施設①②", meaning: "设施；特指儿童养护设施，老人保健设施", reading: "しせつ" },
+{ word: "固有⓪", meaning: "固有（的）；特有（的）；专有（的）", reading: "こゆう" },
+{ word: "～界", meaning: "～界", reading: "～かい" },
+{ word: "しきたり⓪", meaning: "惯例；常规；规矩", reading: "しきたり" },
+{ word: "昔風④", meaning: "古式；老式", reading: "むかしふう" },
+{ word: "髷⓪", meaning: "发髻", reading: "まげ" },
+{ word: "結う⓪", meaning: "绾（发髻）；梳扎（头发）；结", reading: "ゆう" },
+{ word: "和服⓪", meaning: "和服", reading: "わふく" },
+{ word: "行司⓪③", meaning: "相扑裁判员", reading: "ぎょうじ" },
+{ word: "呼び出し⓪", meaning: "（相扑）传呼力士上场的人；（电话的）传呼", reading: "よびだし" },
+{ word: "土俵⓪", meaning: "（相扑）比赛场；竞技场", reading: "どひょう" },
+{ word: "目立つ②", meaning: "引人注目；显著；显眼", reading: "めだつ" },
+{ word: "不在⓪", meaning: "空缺；不在；不存在；无视", reading: "ふざい" },
+{ word: "大関①", meaning: "（相扑）大关（级别仅次于横纲）", reading: "おおぜき" },
+{ word: "いずれも⓪", meaning: "全；都", reading: "いずれも" },
+{ word: "昇進⓪", meaning: "晋级；升级", reading: "しょうしん" },
+{ word: "幕内④⓪", meaning: "（相扑）幕内级力士", reading: "まくうち" },
+{ word: "十両③", meaning: "（相扑）十两（幕内与幕下之间的力士级别）", reading: "じゅうりょう" },
+{ word: "以下①", meaning: "以下；～之下", reading: "いか" },
+{ word: "地位①", meaning: "地位；级别", reading: "ちい" },
+{ word: "ロシア①", meaning: "（国名）俄罗斯；俄国（Russia）", reading: "ロシア" },
+{ word: "ブルガリア③", meaning: "（国名）保加利亚（Bulgaria）", reading: "ブルガリア" },
+{ word: "名を連ねる⓪-③", meaning: "榜上有名；名字赫然在列", reading: "なをつらねる" },
+{ word: "名⓪", meaning: "名字；名气；名号", reading: "な" },
+{ word: "連ねる③", meaning: "连接；串联；联系", reading: "つらねる" },
+{ word: "入門⓪", meaning: "初学；成为弟子", reading: "にゅうもん" },
+{ word: "今や①", meaning: "现在已经；现在正是", reading: "いまや" },
+{ word: "抜き①", meaning: "排除；除去；省去", reading: "ぬき" },
+{ word: "現象⓪", meaning: "现象", reading: "げんしょう" },
+{ word: "相対的⓪", meaning: "相对的", reading: "そうたいてき" },
+{ word: "ハングリー①", meaning: "空腹（的）；饥饿（的）；渴求（的）（hungry）", reading: "ハングリー" },
+{ word: "人前⓪", meaning: "众人面前；人前；外表", reading: "ひとまえ" },
+{ word: "お尻⓪", meaning: "屁股；臀部", reading: "おしり" },
+{ word: "尻②", meaning: "屁股；臀部", reading: "しり" },
+{ word: "説⓪①", meaning: "意见；主张；学说；说法", reading: "せつ" },
+{ word: "一方③", meaning: "一方面；一个方向", reading: "いっぽう" },
+{ word: "点⓪", meaning: "点；论点；观点", reading: "てん" },
+{ word: "むしろ【寧ろ】①", meaning: "莫如；倒是", reading: "むしろ" },
+{ word: "喜ばしい⑤", meaning: "可喜（的）；喜悦（的）；喜闻乐见（的）", reading: "よろこばしい" },
+{ word: "際①", meaning: "～时候；～之际", reading: "さい" },
+{ word: "高見山⓪", meaning: "（人名）高见山", reading: "たかみやま" },
+{ word: "～入り", meaning: "进入～；加入；增添", reading: "～いり" },
+{ word: "みなす（見做す）⓪②", meaning: "看作；认为", reading: "みなす" },
+{ word: "まごつく⓪", meaning: "不知所措；徘徊", reading: "まごつく" },
+{ word: "こぼす【零す·溢す】②", meaning: "落泪；洒泪；弄洒", reading: "こぼす" },
+{ word: "苦労①", meaning: "劳苦；辛苦；操心", reading: "くろう" },
+{ word: "耐えぬく③", meaning: "经受；忍受住了", reading: "たえぬく" },
+{ word: "～ぬく", meaning: "（表示坚持到底）～到底；（表示程度）～极了；极其～", reading: "～ぬく" },
+{ word: "次ぐ⓪", meaning: "次于；仅次于", reading: "つぐ" },
+{ word: "関脇⓪", meaning: "（相扑）关胁（级别仅次于横纲和大关）", reading: "せきわけ" },
+{ word: "平幕⓪", meaning: "（相扑）平幕（幕内级别中非横纲、大关、关胁、小结的力士）", reading: "ひらまく" },
+{ word: "倒す②", meaning: "（用力）推倒；战胜，打败；打倒", reading: "たおす" },
+{ word: "金星①", meaning: "指相扑比赛中平幕级力士打败横纲", reading: "きんぼし" },
+{ word: "巨体⓪", meaning: "庞大的身体", reading: "きょたい" },
+{ word: "愛嬌③", meaning: "讨人喜欢；可爱；魅力", reading: "あいきょう" },
+{ word: "含める③", meaning: "包含；包括；嘱咐；告知", reading: "ふくめる" },
+{ word: "引退⓪", meaning: "引退；退职；辞职", reading: "いんたい" },
+{ word: "テレビコマーシャル⓪-②", meaning: "电视商业广告（television commercial）", reading: "テレビコマーシャル" },
+{ word: "末⓪", meaning: "末尾；末了；结局；最后", reading: "すえ" },
+{ word: "帰化①", meaning: "加入（某国）国籍；（生物）归化", reading: "きか" },
+{ word: "親方③④", meaning: "（相扑的）相扑部屋的掌门人，师傅；（手艺人的）师傅；老板；头目", reading: "おやかた" },
+{ word: "先駆者③", meaning: "先驱；先行者", reading: "せんくしゃ" },
+{ word: "語る⓪", meaning: "讲述；谈论", reading: "かたる" }
                 ],
                 "L4-U1Text": [
                     { word: "趣味", meaning: "爱好", reading: "しゅみ" },
@@ -1389,6 +1484,63 @@ color: #333; /* 深色文字保证可读性 */
             ['ぱ', 'ぴ', 'ぷ', 'ぺ', 'ぽ'],
             ['ゃ', 'ゅ', 'ょ'], 
         ];
+
+        // 片假名
+        const katakana = [
+            ['ア', 'イ', 'ウ', 'エ', 'オ'],
+            ['カ', 'キ', 'ク', 'ケ', 'コ'],
+            ['サ', 'シ', 'ス', 'セ', 'ソ'],
+            ['タ', 'チ', 'ツ', 'テ', 'ト'],
+            ['ナ', 'ニ', 'ヌ', 'ネ', 'ノ'],
+            ['ハ', 'ヒ', 'フ', 'ヘ', 'ホ'],
+            ['マ', 'ミ', 'ム', 'メ', 'モ'],
+            ['ヤ', '', 'ユ', '', 'ヨ'],
+            ['ラ', 'リ', 'ル', 'レ', 'ロ'],
+            ['ワ', '', '', '', 'ヲ'],
+            ['ン'],
+            ['ガ', 'ギ', 'グ', 'ゲ', 'ゴ'],
+            ['ザ', 'ジ', 'ズ', 'ゼ', 'ゾ'],
+            ['ダ', 'ヂ', 'ヅ', 'デ', 'ド'],
+            ['バ', 'ビ', 'ブ', 'ベ', 'ボ'],
+            ['パ', 'ピ', 'プ', 'ペ', 'ポ'],
+            ['ャ', 'ュ', 'ョ'],
+            ['ァ', 'ィ', 'ゥ', 'ェ', 'ォ'],
+            ['ッ', 'ツァ', 'ツィ', 'ツゥ', 'ツェ', 'ツォ'],
+            ['ヴァ', 'ヴィ', 'ヴ', 'ヴェ', 'ヴォ'],
+            ['クァ', 'クィ', 'クゥ', 'クェ', 'クォ'],
+            ['グァ', 'グィ', 'グゥ', 'グェ', 'グォ'],
+            ['シャ', 'シュ', 'ショ'],
+            ['ジャ', 'ジュ', 'ジョ'],
+            ['チャ', 'チュ', 'チョ'],
+            ['ティ', 'ディ', 'デュ'],
+            ['ニャ', 'ニュ', 'ニョ'],
+            ['ヒャ', 'ヒュ', 'ヒョ'],
+            ['ビャ', 'ビュ', 'ビョ'],
+            ['ピャ', 'ピュ', 'ピョ'],
+            ['ミャ', 'ミュ', 'ミョ'],
+            ['リャ', 'リュ', 'リョ'],
+            ['ファ', 'フィ', 'フゥ', 'フェ', 'フォ']
+        ];
+
+        // 平假名转片假名的映射
+        const hiraganaToKatakana = {
+            'あ': 'ア', 'い': 'イ', 'う': 'ウ', 'え': 'エ', 'お': 'オ',
+            'か': 'カ', 'き': 'キ', 'く': 'ク', 'け': 'ケ', 'こ': 'コ',
+            'さ': 'サ', 'し': 'シ', 'す': 'ス', 'せ': 'セ', 'そ': 'ソ',
+            'た': 'タ', 'ち': 'チ', 'つ': 'ツ', 'て': 'テ', 'と': 'ト',
+            'な': 'ナ', 'に': 'ニ', 'ぬ': 'ヌ', 'ね': 'ネ', 'の': 'ノ',
+            'は': 'ハ', 'ひ': 'ヒ', 'ふ': 'フ', 'へ': 'ヘ', 'ほ': 'ホ',
+            'ま': 'マ', 'み': 'ミ', 'む': 'ム', 'め': 'メ', 'も': 'モ',
+            'や': 'ヤ', 'ゆ': 'ユ', 'よ': 'ヨ',
+            'ら': 'ラ', 'り': 'リ', 'る': 'ル', 'れ': 'レ', 'ろ': 'ロ',
+            'わ': 'ワ', 'を': 'ヲ', 'ん': 'ン',
+            'が': 'ガ', 'ぎ': 'ギ', 'ぐ': 'グ', 'げ': 'ゲ', 'ご': 'ゴ',
+            'ざ': 'ザ', 'じ': 'ジ', 'ず': 'ズ', 'ぜ': 'ゼ', 'ぞ': 'ゾ',
+            'だ': 'ダ', 'ぢ': 'ヂ', 'づ': 'ヅ', 'で': 'デ', 'ど': 'ド',
+            'ば': 'バ', 'び': 'ビ', 'ぶ': 'ブ', 'べ': 'ベ', 'ぼ': 'ボ',
+            'ぱ': 'パ', 'ぴ': 'ピ', 'ぷ': 'プ', 'ぺ': 'ペ', 'ぽ': 'ポ',
+            'ゃ': 'ャ', 'ゅ': 'ュ', 'ょ': 'ョ'
+        };
 
         // 初始化
         document.addEventListener('DOMContentLoaded', function() {
@@ -1592,8 +1744,16 @@ color: #333; /* 深色文字保证可读性 */
             
             const currentWord = currentWords[currentIndex];
             document.getElementById('meaning').textContent = currentWord.meaning;
-            document.getElementById('word').textContent = currentWord.word;
+            // 修改这里：初始时不显示单词
+            document.getElementById('word').textContent = ' ';
+            document.getElementById('word').classList.add('hidden-word');
             
+              // 清除之前的反馈信息
+            const feedback = document.querySelector('.result-feedback');
+            if (feedback) {
+                feedback.innerHTML = '';
+            }
+
             // 设置答案输入框
             const answerInput = document.getElementById('answer-input');
             answerInput.innerHTML = '';
@@ -1615,9 +1775,26 @@ color: #333; /* 深色文字保证可读性 */
             document.getElementById('progress').style.width = `${progress}%`;
         }
 
+        // 判断是否为外来语的函数
+        function isForeignWord(word) {
+            // 外来语通常包含片假名或罗马字母
+            const katakanaRegex = /[\u30A0-\u30FF]/; // 片假名范围
+            const romanRegex = /[A-Za-z]/; // 罗马字母
+            
+            // 如果单词包含片假名或罗马字母，则认为是外来语
+            return katakanaRegex.test(word) || romanRegex.test(word);
+        }
+
+        // 生成假名选项的函数
         function generateKanaOptions(correctReading) {
             const kanaSelection = document.getElementById('kana-selection');
             kanaSelection.innerHTML = '';
+            
+            // 获取当前单词
+            const currentWord = currentWords[currentIndex];
+            
+            // 判断是否为外来语
+            const isForeign = isForeignWord(currentWord.word);
             
             // 收集所有需要的假名
             const neededKana = new Set();
@@ -1625,17 +1802,40 @@ color: #333; /* 深色文字保证可读性 */
                 neededKana.add(char);
             }
             
-            // 添加一些随机假名
+            // 检查是否包含拗音
+            const hasYouon = /ゃ|ゅ|ょ/.test(correctReading);
+            
+            // 根据是否为外来语选择使用平假名还是片假名
             const allKana = [];
-            hiragana.forEach(row => {
-                row.forEach(kana => {
-                    if (kana) allKana.push(kana);
+            if (isForeign) {
+                // 外来语使用片假名
+                katakana.forEach(row => {
+                    row.forEach(kana => {
+                        if (kana) allKana.push(kana);
+                    });
                 });
-            });
+            } else {
+                // 一般单词使用平假名
+                hiragana.forEach(row => {
+                    row.forEach(kana => {
+                        if (kana) allKana.push(kana);
+                    });
+                });
+            }
             
             // 确保有足够的假名选项
             const totalOptions = 18;
             const options = Array.from(neededKana);
+            
+            // 如果包含拗音，确保小や、ゆ、よ都在选项中
+            if (hasYouon) {
+                const smallYaKana = ['ゃ', 'ゅ', 'ょ'];
+                smallYaKana.forEach(kana => {
+                    if (!options.includes(kana)) {
+                        options.push(kana);
+                    }
+                });
+            }
             
             while (options.length < totalOptions) {
                 const randomIndex = Math.floor(Math.random() * allKana.length);
@@ -1663,6 +1863,12 @@ color: #333; /* 深色文字保证可读性 */
                     const kana = options[optionIndex];
                     const button = document.createElement('button');
                     button.className = 'kana-btn';
+                    
+                    // 为小假名添加特殊样式
+                    if (['ゃ', 'ゅ', 'ょ'].includes(kana)) {
+                        button.classList.add('small-yakana-btn');
+                    }
+                    
                     button.textContent = kana;
                     button.addEventListener('click', function() {
                         selectKana(kana);
@@ -1737,27 +1943,69 @@ color: #333; /* 深色文字保证可读性 */
                 isCorrect: isCorrect
             });
             
-            if (isCorrect) {
+            let feedback = document.querySelector('.result-feedback');
+            if (!feedback) {
+                feedback = document.createElement('div');
+                feedback.className = 'result-feedback';
+                document.querySelector('.game-area').insertBefore(feedback, document.getElementById('answer-input'));
+            }
+            feedback.innerHTML = '';
+   
+         if (isCorrect) {
                 correctCount++;
                 document.getElementById('correct-count').textContent = correctCount;
                 playCorrectSound();
                 createFireworks();
+
+　　　　// 回答正确后显示单词
+                document.getElementById('word').textContent = currentWord.word;
+                document.getElementById('word').classList.remove('hidden-word');
+                
+                // 显示正确反馈
+                const correctMsg = document.createElement('div');
+                correctMsg.className = 'correct-word';
+                correctMsg.textContent = '正解！';
+                correctMsg.style.color = 'var(--leaf-green)';
+                feedback.appendChild(correctMsg);                
+
             } else {
+
                 // 记录错题
                 wrongWords.push({
                     word: currentWord.word,
                     meaning: currentWord.meaning,
                     reading: currentWord.reading
                 });
-                playWrongSound();
-            }
-            
+playWrongSound();
+
+         // 显示残念字样
+                const zannenMsg = document.createElement('div');
+                zannenMsg.className = 'zannen-message';
+                zannenMsg.textContent = '残念！';
+                feedback.appendChild(zannenMsg);  }          
+           
+                
+                // 显示正确答案
+                const correctAnswer = document.createElement('div');
+                correctAnswer.className = 'correct-word';
+                correctAnswer.innerHTML = `正解: <span style="color: var(--sakura-dark-pink)">${currentWord.word}</span> (${correctReading})`;
+                feedback.appendChild(correctAnswer);
+
+ // 显示用户答案
+                const userAnswerMsg = document.createElement('div');
+                userAnswerMsg.className = 'correct-word';
+                userAnswerMsg.innerHTML = `あなたの答え: <span style="color: #ff4444">${userAnswer}</span>`;
+                userAnswerMsg.style.fontSize = '14px';
+                userAnswerMsg.style.marginTop = '0px';
+                feedback.appendChild(userAnswerMsg);
+                
+                     
             // 更新准确率
             const accuracy = Math.round((correctCount / (currentIndex + 1)) * 100);
             document.getElementById('accuracy').textContent = accuracy;
             
             currentIndex++;
-            setTimeout(showNextWord, isCorrect ? 800 : 600);
+            setTimeout(showNextWord, isCorrect ? 1000 : 2500);
         }
 
         function endGame() {
@@ -1839,7 +2087,7 @@ color: #333; /* 深色文字保证可读性 */
                 case 'zhry1': return '総合日語1';
                 case 'zhry2': return '総合日語2';
                 case 'zhry3': return '総合日語3';
-                  case 'zhry4': return '総合日語4';
+                case 'zhry4': return '総合日語4';
 　　　　　default: return '';
             }
         }
@@ -1945,4 +2193,4 @@ color: #333; /* 深色文字保证可读性 */
         }
     </script>
 </body>
-</html>    
+</html>
