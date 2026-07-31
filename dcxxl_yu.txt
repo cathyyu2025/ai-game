@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>日语单词消消乐</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --main-green: #4CAF50;
+            --light-green: #C8E6C9;
+            --dark-green: #388E3C;
+            --wrong-red: #e57373;
+            --card-height: 55px;
+        }
+        * { box-sizing: border-box; }
+        body {
+            background-color: var(--light-green);
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin: 20px;
+            max-width: 1200px;
+            width: 90%;
+            text-align: center;
+        }
+        .game-controls { display: flex; flex-direction: column; gap: 15px; margin: 20px 0; }
+        .card-container {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px auto;
+            max-width: 1000px;
+        }
+        .col {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            max-width: 45%;
+            min-width: 200px;
+        }
+        .col-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: var(--dark-green);
+            margin-bottom: 8px;
+            border-bottom: 2px solid var(--main-green);
+            padding-bottom: 5px;
+        }
+        .card {
+            background: #f1f8e9;
+            border: 2px solid var(--main-green);
+            border-radius: 8px;
+            padding: 4px 8px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+            font-size: 15px;
+            width: 100%;
+            height: var(--card-height);
+            min-height: var(--card-height);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            word-break: break-word;
+            line-height: 1.3;
+            user-select: none;
+            box-sizing: border-box;
+        }
+        .card.selected {
+            transform: scale(0.97);
+            box-shadow: 0 0 12px var(--main-green);
+            background-color: #E8F5E9 !important;
+            border-color: var(--dark-green);
+        }
+        .card.wrong {
+            animation: wrongAnim 0.6s;
+        }
+        @keyframes wrongAnim {
+            0%,100%{ background-color: #f1f8e9; }
+            25%{ background-color: var(--wrong-red); transform: scale(0.95); }
+            75%{ background-color: var(--wrong-red); transform: scale(0.95); }
+        }
+        button {
+            background: var(--main-green);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 10px;
+            transition: background 0.3s;
+            font-size: 16px;
+            min-width: 160px;
+        }
+        button:hover { background: var(--dark-green); }
+        #leaderboard {
+            margin: 30px auto;
+            width: 80%;
+            border: 2px solid var(--main-green);
+            border-radius: 15px;
+            padding: 20px;
+            background: white;
+        }
+        #importedWords {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px dashed var(--main-green);
+            border-radius: 8px;
+            background: #F1F8E9;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .word-item {
+            padding: 8px;
+            border: 1px solid #81C784;
+            border-radius: 4px;
+            text-align: center;
+            background: white;
+            font-size: 0.8em;
+            word-break: break-all;
+        }
+        input[type="text"] {
+            padding: 10px;
+            border: 2px solid var(--main-green);
+            border-radius: 25px;
+            margin: 10px;
+            width: 200px;
+            text-align: center;
+        }
+        .button-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .stats-container {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            font-size: 1.2em;
+            color: var(--dark-green);
+            margin: 15px 0;
+        }
+        #leaderboardTable { width: 100%; border-collapse: collapse; }
+        #leaderboardTable th, #leaderboardTable td {
+            padding: 10px 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        #leaderboardTable th { background-color: var(--light-green); }
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            .card-container { flex-direction: column; align-items: center; }
+            .col { max-width: 90%; }
+            #importedWords { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 480px) {
+            #importedWords { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="color: var(--dark-green);">日本語単語マッチング</h1>
+        <div class="button-group">
+            <input type="text" id="playerName" placeholder="プレイヤー名を入力">
+            <button onclick="document.getElementById('fileInput').click()">📁 単語をインポート</button>
+        </div>
+        <div id="importedWords"></div>
+        <div class="game-controls">
+            <div class="stats-container">
+                <span>🕒 時間: <span id="timer">00:00</span></span>
+                <span>✅ 正解数: <span id="correctCount">0</span></span>
+            </div>
+            <button onclick="startGame()">▶ ゲームスタート</button>
+        </div>
+        <div id="gameBoard" class="card-container">
+            <div class="col" id="leftCol"><div class="col-title">📖 単語</div></div>
+            <div class="col" id="rightCol"><div class="col-title">📝 意味</div></div>
+        </div>
+        <div id="leaderboard">
+            <h3>🏆 ランキング</h3>
+            <table id="leaderboardTable"><thead><tr><th>順位</th><th>プレイヤー</th><th>正解数</th><th>時間</th></tr></thead><tbody></tbody></table>
+        </div>
+        <input type="file" id="fileInput" accept=".txt,.csv,.xlsx" hidden>
+        <audio id="correctSound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
+    </div>
+    <script>
+        // ---------- 数据 ----------
+        let wordPairs = [];
+        let remainingPairs = [];    // 当前游戏中剩余未匹配的配对
+        let selectedCard = null;
+        let startTime, timerInterval, correctCount = 0;
+        let gameRunning = false;
+
+        const defaultWords = [
+            {word: "ありがとう", meaning: "谢谢"},
+            {word: "こんにちは", meaning: "你好"},
+            {word: "さようなら", meaning: "再见"},
+            {word: "おやすみ", meaning: "晚安"},
+            {word: "すみません", meaning: "对不起"},
+            {word: "おはよう", meaning: "早上好"},
+            {word: "こんばんは", meaning: "晚上好"},
+            {word: "いただきます", meaning: "我开动了"},
+            {word: "ごちそうさま", meaning: "多谢款待"},
+            {word: "お願いします", meaning: "拜托了"}
+        ];
+
+        // 初始化排行榜
+        (function init() {
+            if (!localStorage.getItem('wordGameRecords')) localStorage.setItem('wordGameRecords', JSON.stringify([]));
+            showLeaderboard();
+        })();
+
+        // 文件导入
+        document.getElementById('fileInput').addEventListener('change', handleFile);
+        function handleFile(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', codepage: 65001 });
+                    const sheetName = workbook.SheetNames.find(name => {
+                        const sheet = workbook.Sheets[name];
+                        return XLSX.utils.sheet_to_json(sheet).length > 0;
+                    }) || workbook.SheetNames[0];
+                    const sheet = workbook.Sheets[sheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(sheet, {
+                        header: ['word', 'meaning'],
+                        range: 0,
+                        blankrows: false,
+                        defval: ""
+                    });
+                    wordPairs = jsonData
+                        .filter(row => row.word && row.meaning)
+                        .map(row => ({
+                            word: sanitizeText(row.word),
+                            meaning: sanitizeText(row.meaning)
+                        }));
+                    if (wordPairs.length === 0) throw new Error('有効なデータが見つかりません');
+                    showImportedWords();
+                    alert(`成功导入 ${wordPairs.length} 组单词！`);
+                } catch (error) {
+                    alert(`ファイルの読み込みに失敗しました: ${error.message}`);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        function sanitizeText(text) {
+            return text.toString().replace(/^\uFEFF/, '').replace(/[\u0000-\u001F]/g, '').trim();
+        }
+        function showImportedWords() {
+            const container = document.getElementById('importedWords');
+            const display = wordPairs.slice(0, 30);
+            container.innerHTML = display.map(p => `<div class="word-item">${p.word}<br>${p.meaning}</div>`).join('');
+            if (wordPairs.length > 30) container.innerHTML += `<div class="word-item">…他 ${wordPairs.length-30} 組</div>`;
+        }
+
+        // ---------- 游戏核心 ----------
+        function startGame() {
+            let pool = wordPairs.length ? wordPairs : defaultWords;
+            const count = Math.min(10, pool.length);
+            const shuffledPool = shuffleArray([...pool]);
+            const selected = shuffledPool.slice(0, count);
+            if (selected.length === 0) {
+                alert('単語がありません。先にインポートしてください。');
+                return;
+            }
+            resetGame();          // 先重置，清空 remainingPairs
+            remainingPairs = selected;  // 再赋值
+            gameRunning = true;
+            renderGameBoard();
+            startTimer();
+        }
+
+        // 重新渲染左右列（根据 remainingPairs，左右分别打乱顺序）
+        function renderGameBoard() {
+            if (!gameRunning && remainingPairs.length > 0) return;
+            // 准备左右卡片数据，分别打乱
+            const wordCards = remainingPairs.map((p, idx) => ({
+                pairId: idx,
+                type: 'word',
+                display: p.word,
+                pair: p
+            }));
+            const meaningCards = remainingPairs.map((p, idx) => ({
+                pairId: idx,
+                type: 'meaning',
+                display: p.meaning,
+                pair: p
+            }));
+            shuffleArray(wordCards);
+            shuffleArray(meaningCards);
+            renderCol('leftCol', wordCards);
+            renderCol('rightCol', meaningCards);
+        }
+
+        function renderCol(colId, cards) {
+            const col = document.getElementById(colId);
+            const title = col.querySelector('.col-title');
+            col.innerHTML = '';
+            col.appendChild(title);
+            cards.forEach(cardData => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.dataset.pairId = cardData.pairId;
+                card.dataset.type = cardData.type;
+                card.textContent = cardData.display;
+                card.addEventListener('click', () => handleCardClick(card));
+                col.appendChild(card);
+            });
+        }
+
+        function handleCardClick(card) {
+            if (!gameRunning) return;
+            if (card.classList.contains('selected') && selectedCard === card) {
+                card.classList.remove('selected');
+                selectedCard = null;
+                return;
+            }
+            if (selectedCard) {
+                const first = selectedCard;
+                if (first === card) return;
+                // 类型相同则切换选中
+                if (first.dataset.type === card.dataset.type) {
+                    first.classList.remove('selected');
+                    card.classList.add('selected');
+                    selectedCard = card;
+                    return;
+                }
+                // 类型不同，配对
+                if (first.dataset.pairId === card.dataset.pairId) {
+                    // 配对成功
+                    const pairId = parseInt(first.dataset.pairId);
+                    // 从 remainingPairs 中移除该配对
+                    remainingPairs = remainingPairs.filter((_, idx) => idx !== pairId);
+                    correctCount++;
+                    document.getElementById('correctCount').textContent = correctCount;
+                    document.getElementById('correctSound').play();
+                    // 移除选中状态
+                    first.classList.remove('selected');
+                    selectedCard = null;
+                    // 重新渲染游戏板（剩余卡片重新排列对齐）
+                    renderGameBoard();
+                    // 检查是否完成
+                    if (remainingPairs.length === 0) {
+                        gameRunning = false;
+                        clearInterval(timerInterval);
+                        const timeStr = document.getElementById('timer').textContent;
+                        updateLeaderboard();
+                        setTimeout(() => {
+                            alert(`🎉 ゲームクリア！\n時間: ${timeStr}\n正解数: ${correctCount}`);
+                        }, 500);
+                    }
+                } else {
+                    // 配对失败
+                    first.classList.add('wrong');
+                    card.classList.add('wrong');
+                    first.classList.remove('selected');
+                    setTimeout(() => {
+                        first.classList.remove('wrong');
+                        card.classList.remove('wrong');
+                    }, 700);
+                    selectedCard = null;
+                }
+            } else {
+                card.classList.add('selected');
+                selectedCard = card;
+            }
+        }
+
+        // 工具函数
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        function startTimer() {
+            startTime = Date.now();
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                const seconds = Math.floor((Date.now() - startTime) / 1000);
+                document.getElementById('timer').textContent = 
+                    `${String(Math.floor(seconds/60)).padStart(2,'0')}:${String(seconds%60).padStart(2,'0')}`;
+            }, 1000);
+        }
+
+        function resetGame() {
+            correctCount = 0;
+            selectedCard = null;
+            document.getElementById('correctCount').textContent = '0';
+            clearInterval(timerInterval);
+            document.getElementById('timer').textContent = '00:00';
+            document.getElementById('leftCol').innerHTML = '<div class="col-title">📖 単語</div>';
+            document.getElementById('rightCol').innerHTML = '<div class="col-title">📝 意味</div>';
+            gameRunning = false;
+            remainingPairs = [];
+        }
+
+        // 排行榜
+        function updateLeaderboard() {
+            const playerName = document.getElementById('playerName').value.trim() || '匿名プレイヤー';
+            const time = document.getElementById('timer').textContent;
+            const records = JSON.parse(localStorage.getItem('wordGameRecords') || '[]');
+            records.push({ name: playerName, score: correctCount, time: time, timestamp: Date.now() });
+            records.sort((a, b) => b.score - a.score || a.timestamp - b.timestamp);
+            localStorage.setItem('wordGameRecords', JSON.stringify(records.slice(0, 10)));
+            showLeaderboard();
+        }
+        function showLeaderboard() {
+            const records = JSON.parse(localStorage.getItem('wordGameRecords') || '[]');
+            const tbody = document.querySelector('#leaderboardTable tbody');
+            tbody.innerHTML = records.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.score}</td><td>${r.time}</td></tr>`).join('');
+        }
+
+        // 页面加载默认显示
+        window.onload = function() {
+            if (wordPairs.length === 0) {
+                wordPairs = [...defaultWords];
+                showImportedWords();
+            }
+        };
+    </script>
+</body>
+</html>
