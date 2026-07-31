@@ -162,6 +162,7 @@
             <div class="dropdown-content">
                 <a href="kana1.html">五十音图练习</a>
                 <a href="zhry_wordgame.html">单词记忆</a>
+                <a href="dcxxl_yu.html">单词消消乐</a>
                 <a href="kanji-game.html">汉字书写</a>
                 <a href="conversation-game.html">会话练习</a>
             </div>
@@ -180,6 +181,7 @@
             <div class="dropdown-content">
                 <a href="kana1.html">五十音图练习</a>
                 <a href="zhry_wordgame.html">单词记忆</a>
+                <a href="dcxxl_yu.html">单词消消乐</a>
                 <a href="kanji-game.html">汉字书写</a>
                 <a href="conversation-game.html">会话练习</a>
             </div>
