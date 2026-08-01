@@ -133,14 +133,17 @@
             font-size: 0.8em;
             word-break: break-all;
         }
-        input[type="text"] {
+        input[type="text"], select {
             padding: 10px;
             border: 2px solid var(--main-green);
             border-radius: 25px;
             margin: 10px;
-            width: 200px;
             text-align: center;
+            background: white;
+            font-size: 14px;
         }
+        input[type="text"] { width: 200px; }
+        select { width: 150px; cursor: pointer; }
         .button-group {
             display: flex;
             justify-content: center;
@@ -163,6 +166,14 @@
             border-bottom: 1px solid #ddd;
         }
         #leaderboardTable th { background-color: var(--light-green); }
+        .select-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin: 10px 0;
+        }
         @media (max-width: 768px) {
             .container { padding: 15px; }
             .card-container { flex-direction: column; align-items: center; }
@@ -180,6 +191,15 @@
         <div class="button-group">
             <input type="text" id="playerName" placeholder="プレイヤー名を入力">
             <button onclick="document.getElementById('fileInput').click()">📁 単語をインポート</button>
+        </div>
+        <div class="select-group">
+            <select id="bookSelect" onchange="onBookChange()">
+                <option value="">-- 教材を選択 --</option>
+            </select>
+            <select id="lessonSelect" onchange="onLessonChange()">
+                <option value="">-- 課を選択 --</option>
+            </select>
+            <button onclick="loadBuiltInWords()">📚 内置単語を読み込む</button>
         </div>
         <div id="importedWords"></div>
         <div class="game-controls">
@@ -201,9 +221,1004 @@
         <audio id="correctSound" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU"></audio>
     </div>
     <script>
+        // ============================================================
+        //  内置词库（已新增《综合日语B3》《综合日语B4》各10课）
+        // ============================================================
+        const builtInWords = {
+            // ----- 原有《新标日初级上》-----
+            "新标日初级上": {
+                "L1": [
+                    {word: "わたし", meaning: "我"},
+                    {word: "あなた", meaning: "你"},
+                    {word: "学生", meaning: "学生"},
+                    {word: "先生", meaning: "老师"},
+                    {word: "会社員", meaning: "公司职员"},
+                    {word: "はい", meaning: "是的"},
+                    {word: "いいえ", meaning: "不是"},
+                    {word: "初めまして", meaning: "初次见面"},
+                    {word: "どうぞ", meaning: "请"},
+                    {word: "よろしく", meaning: "请多关照"}
+                ],
+                "第2课": [
+                    {word: "本", meaning: "书"},
+                    {word: "雑誌", meaning: "杂志"},
+                    {word: "辞書", meaning: "词典"},
+                    {word: "新聞", meaning: "报纸"},
+                    {word: "ノート", meaning: "笔记本"},
+                    {word: "鉛筆", meaning: "铅笔"},
+                    {word: "これ", meaning: "这个"},
+                    {word: "それ", meaning: "那个"},
+                    {word: "あれ", meaning: "那个（远处）"},
+                    {word: "どれ", meaning: "哪个"}
+                ]
+            },
+            // ----- 原有《新标日初级下》-----
+            "新标日初级下": {
+                "第25课": [
+                    {word: "旅行", meaning: "旅行"},
+                    {word: "計画", meaning: "计划"},
+                    {word: "準備", meaning: "准备"},
+                    {word: "荷物", meaning: "行李"},
+                    {word: "パスポート", meaning: "护照"},
+                    {word: "チケット", meaning: "票"},
+                    {word: "ホテル", meaning: "酒店"},
+                    {word: "観光", meaning: "观光"},
+                    {word: "写真", meaning: "照片"},
+                    {word: "お土産", meaning: "伴手礼"}
+                ],
+                "第26课": [
+                    {word: "運動", meaning: "运动"},
+                    {word: "健康", meaning: "健康"},
+                    {word: "食事", meaning: "饮食"},
+                    {word: "睡眠", meaning: "睡眠"},
+                    {word: "ストレス", meaning: "压力"},
+                    {word: "リラックス", meaning: "放松"},
+                    {word: "趣味", meaning: "兴趣"},
+                    {word: "音楽", meaning: "音乐"},
+                    {word: "映画", meaning: "电影"},
+                    {word: "読書", meaning: "读书"}
+                ]
+            },
+            // ======================== 新增 ============================
+            // ----- 《综合日语B3》 10课 -----
+            "综合日语B3": {
+                "L1U1Text": [
+{word: "えんしゅうしつ③", meaning: "研究讨论室；教室"},
+{word: "みえる②", meaning: "（「来る」的尊敬表达）来；到；光临；抵达"},
+{word: "レジュメ⓪", meaning: "提纲（法语résumé）"},
+{word: "ノック①", meaning: "敲；轻叩（knock）"},
+{word: "あの⓪", meaning: "请问；啊"},
+{word: "こんがっき③", meaning: "本学期；这学期"},
+{word: "もうす①", meaning: "（「言う」的自谦说法）说；叫做，称作"},
+{word: "かんげいかい③⓪", meaning: "欢迎会"},
+{word: "はりきる③", meaning: "兴奋；干劲十足；紧张"},
+{word: "ねんしょうしゃ③", meaning: "少年；年纪轻者（未成年人）"},
+{word: "テニスぶ③", meaning: "网球俱乐部；网球队"},
+{word: "ふくぶちょう③", meaning: "副部长"},
+{word: "アモイ①", meaning: "（地名）厦门（葡萄牙语Amoy）"},
+{word: "そつろん⓪", meaning: "（本科）毕业论文"},
+{word: "おっちょこちょい⑤", meaning: "不稳重；轻浮；马虎"}
+                ],
+                "L1U2Text": [
+{word: "ほんがく①", meaning: "本校（专指大学）"},
+{word: "しぼる②", meaning: "挤；限定；集中"},
+{word: "もうける③", meaning: "准备；设立；设置"},
+{word: "むろん⓪", meaning: "当然；不用说"},
+{word: "ひっしゅう⓪", meaning: "必修；必选"},
+{word: "がいして①", meaning: "一般；大体；大概"},
+{word: "じかんたい⓪", meaning: "时间带；时间段"},
+{word: "まかす②", meaning: "交给；听任；任凭"},
+{word: "さぎょう①", meaning: "作业；操作"},
+{word: "じしゅせい⓪", meaning: "自主性"},
+{word: "しゅたいせい⓪", meaning: "主体性；独立性"},
+{word: "かくりつ⓪", meaning: "确立"},
+{word: "くぎり③", meaning: "阶段；句子的停顿处；段落"},
+{word: "りしゅうガイド④", meaning: "学习指导；课程指导"},
+{word: "やまのて⓪", meaning: "（在农村或城镇里）靠山的地方；城市中地势较高的地区（在东京特指四谷、青山、市谷、小石川等住宅密集的地区）"},
+{word: "したまち⓪", meaning: "（都市中的）低洼地区；在东京特指下谷、浅草、神田、日本桥等老城区"},
+{word: "きょうざい⓪", meaning: "教材；教科书"},
+{word: "きょうぐ①", meaning: "教具；教学用品"},
+{word: "ひく⓪", meaning: "引起；拉；拽；牵引"},
+{word: "ならぶ⓪", meaning: "排列；排；摆满；比得上"},
+{word: "わけ①", meaning: "原因；理由"},
+{word: "もと②", meaning: "下面；～之下"},
+{word: "がくゆう⓪", meaning: "学友；同学；校友"},
+{word: "かくど①", meaning: "角度；观点；立场"},
+{word: "まなぶ⓪", meaning: "学习"},
+{word: "しゅやく⓪", meaning: "（影、剧）主角；（转）主要人物"},
+{word: "あくまで②①", meaning: "始终；到底"},
+{word: "こうぎ①", meaning: "讲授；讲解；讲义；课"},
+{word: "いっぽうてき⓪", meaning: "单方面的；一方面的"},
+{word: "とうろん①", meaning: "讨论"},
+{word: "てだすけ②", meaning: "帮助；帮"},
+{word: "やく②", meaning: "角色；任务；工作"},
+{word: "つとめる③", meaning: "担任；扮演；做"},
+{word: "やしなう⓪③", meaning: "培养；抚养"},
+{word: "たんに①", meaning: "只；仅；单"},
+{word: "しめくくり⓪", meaning: "总结；结束（締め括り•しめくくり）"},
+{word: "ふさわしい④", meaning: "适合（的）；相称（的）；般配（的）"}
+                ],
+                "L2U1Text": [
+{word: "おす①", meaning: "（用于年轻男性之间打招呼）你好"},
+{word: "からてぎ⓪", meaning: "空手道服"},
+{word: "カンフー①", meaning: "功夫；中国武术（Kungfu）"},
+{word: "ホンコン①", meaning: "（地名）香港"},
+{word: "えいがスター⑤", meaning: "电影明星"},
+{word: "スター①", meaning: "明星；星星（star）"},
+{word: "たいきょくけん③④", meaning: "太极拳"},
+{word: "かた②", meaning: "（技艺、运动等传统的）形式；样式；型"},
+{word: "オッケー①", meaning: "（表示同意）好；可以（OK）"},
+{word: "まいった②①", meaning: "行吧！好吧！糟糕！"},
+{word: "のぞく⓪", meaning: "瞅；稍微看看；瞧瞧；窥视"},
+{word: "ふしょうぶしょう④", meaning: "不情愿；勉勉强强"},
+{word: "しょうだく⓪", meaning: "答应；承诺；允许"}
+                ],
+                "L2U2Text": [
+{word: "モットー①", meaning: "宗旨；口号；座右铭（motto）"},
+{word: "なにより①⓪", meaning: "比什么（都好）；最好"},
+{word: "ごうどう⓪", meaning: "共同；联合；合并"},
+{word: "ていど①⓪", meaning: "程度"},
+{word: "れんらくさき⓪", meaning: "联系人；联系单位；联系地点"},
+{word: "～さき", meaning: "～处；～地；～地点"},
+{word: "しょしんしゃ②", meaning: "第一次做～的人"},
+{word: "もとむ②", meaning: "寻求；希望"},
+{word: "だんたいせん⓪", meaning: "团体赛"},
+{word: "だんたい⓪", meaning: "团体；集体"},
+{word: "～せん", meaning: "～之战；～的比赛"},
+{word: "もくひょう⓪", meaning: "目标"},
+{word: "けいこ①", meaning: "学习；练习；排练；功夫"},
+{word: "きたえる③", meaning: "锻炼"},
+{word: "みけいけんしゃ④", meaning: "没有经验的人"},
+{word: "み～", meaning: "没有～；未～"},
+{word: "マネージャー②⓪①", meaning: "管理人；干事；经纪人；助理（manager）"},
+{word: "ぶどうじょう⓪", meaning: "武馆；练武场"},
+{word: "しゅわ①", meaning: "手语；哑语"},
+{word: "こだま⓪", meaning: "回声"},
+{word: "こうき①", meaning: "下学期；后期；后半期"},
+{word: "き①", meaning: "机会；时机"},
+{word: "みなみこうぎとう④", meaning: "南教学楼"},
+{word: "～とう", meaning: "（表示大型房屋建筑）～楼；～栋"},
+{word: "マイク·ジェイソン④", meaning: "（人名）迈克·杰森（Mike Jason）"},
+{word: "とまどう③", meaning: "不知所措；犹豫不决；徘徊"},
+{word: "ゆうき①", meaning: "勇气"},
+{word: "える①", meaning: "得到"}
+                ],
+                "L3U1Text": [
+{word: "おおずもう③", meaning: "职业相扑比赛"},
+{word: "おお～", meaning: "大～"},
+{word: "はっけよい①", meaning: "（相扑）（两者对峙时，裁判的喊声）好；加油"},
+{word: "りょうごく⓪", meaning: "两国"},
+{word: "こくぎかん③②", meaning: "国技馆；相扑体育馆"},
+{word: "りきし①⓪", meaning: "力士（相扑运动员）"},
+{word: "あさのうみ③", meaning: "（人名）朝海"},
+{word: "ハワイ①", meaning: "（地名）夏威夷（Hawaii）"},
+{word: "ふーん①", meaning: "是嘛"},
+{word: "モンゴル①", meaning: "（国名）蒙古（Mongol）"},
+{word: "ほくせいざん③", meaning: "（人名）北星山"},
+{word: "かつ①", meaning: "战胜；获胜；克制；占优势"},
+{word: "ちよのはな③", meaning: "（人名）千代乃花"},
+{word: "のこった②", meaning: "（相扑裁判员鼓励力士的喊声）加油、加油！继续、继续！"},
+{word: "えんりょ⓪", meaning: "客气；拘谨；回避"},
+{word: "さすが⓪", meaning: "的确，确实；不愧～"},
+{word: "とんでもない⑤", meaning: "（强烈否定对方的说法）哪里的话"},
+{word: "せいいっぱい④", meaning: "尽力；全力以赴"},
+{word: "いよいよ②", meaning: "终于；总算是"},
+{word: "わかのふじ③", meaning: "（人名）若富山"},
+{word: "よこづな⓪", meaning: "（日本相扑运动员资格最高级）横纲；【转】首屈一指者"},
+{word: "ハラハラ①", meaning: "非常担心；捏一把汗；（树叶、眼泪等）扑簌下落貌"},
+{word: "たしかに①", meaning: "的确；确实"},
+{word: "まあまあ①-①", meaning: "（表示抚慰或催促）好了好了；行了"},
+{word: "こくぎ①②", meaning: "国技；一个国家的传统武术、技艺、运动等"}
+                ],
+                "L3U2Text": [
+{word: "しせつ①②", meaning: "设施；特指儿童养护设施，老人保健设施"},
+{word: "こゆう⓪", meaning: "固有（的）；特有（的）；专有（的）"},
+{word: "～かい", meaning: "～界"},
+{word: "しきたり⓪", meaning: "惯例；常规；规矩"},
+{word: "むかしふう④", meaning: "古式；老式"},
+{word: "まげ⓪", meaning: "发髻"},
+{word: "ゆう⓪", meaning: "绾（发髻）；梳扎（头发）；结"},
+{word: "わふく⓪", meaning: "和服"},
+{word: "ぎょうじ⓪③", meaning: "相扑裁判员"},
+{word: "よびだし⓪", meaning: "（相扑）传呼力士上场的人；（电话的）传呼"},
+{word: "どひょう⓪", meaning: "（相扑）比赛场；竞技场"},
+{word: "めだつ②", meaning: "引人注目；显著；显眼"},
+{word: "ふざい⓪", meaning: "空缺；不在；不存在；无视"},
+{word: "おおぜき①", meaning: "（相扑）大关（级别仅次于横纲）"},
+{word: "いずれも⓪", meaning: "全；都"},
+{word: "しょうしん⓪", meaning: "晋级；升级"},
+{word: "まくうち④⓪", meaning: "（相扑）幕内级力士"},
+{word: "じゅうりょう③", meaning: "（相扑）十两（幕内与幕下之间的力士级别）"},
+{word: "いか①", meaning: "以下；～之下"},
+{word: "ちい①", meaning: "地位；级别"},
+{word: "ロシア①", meaning: "（国名）俄罗斯；俄国（Russia）"},
+{word: "ブルガリア③", meaning: "（国名）保加利亚（Bulgaria）"},
+{word: "なをつらねる⓪-③", meaning: "榜上有名；名字赫然在列"},
+{word: "な⓪", meaning: "名字；名气；名号"},
+{word: "つらねる③", meaning: "连接；串联；联系"},
+{word: "にゅうもん⓪", meaning: "初学；成为弟子"},
+{word: "いまや①", meaning: "现在已经；现在正是"},
+{word: "ぬき①", meaning: "排除；除去；省去"},
+{word: "げんしょう⓪", meaning: "现象"},
+{word: "そうたいてき⓪", meaning: "相对的"},
+{word: "ハングリー①", meaning: "空腹（的）；饥饿（的）；渴求（的）（hungry）"},
+{word: "ひとまえ⓪", meaning: "众人面前；人前；外表"},
+{word: "おしり⓪", meaning: "屁股；臀部"},
+{word: "しり②", meaning: "屁股；臀部"},
+{word: "せつ⓪①", meaning: "意见；主张；学说；说法"},
+{word: "いっぽう③", meaning: "一方面；一个方向"},
+{word: "てん⓪", meaning: "点；论点；观点"},
+{word: "むしろ①", meaning: "莫如；倒是"},
+{word: "よろこばしい⑤", meaning: "可喜（的）；喜悦（的）；喜闻乐见（的）"},
+{word: "さい①", meaning: "～时候；～之际"},
+{word: "たかみやま⓪", meaning: "（人名）高见山"},
+{word: "～いり", meaning: "进入～；加入；增添"},
+{word: "みなす⓪②", meaning: "看作；认为"},
+{word: "まごつく⓪", meaning: "不知所措；徘徊"},
+{word: "こぼす②", meaning: "落泪；洒泪；弄洒"},
+{word: "くろう①", meaning: "劳苦；辛苦；操心"},
+{word: "たえぬく③", meaning: "经受；忍受住了"},
+{word: "～ぬく", meaning: "（表示坚持到底）～到底；（表示程度）～极了；极其～"},
+{word: "つぐ⓪", meaning: "次于；仅次于"},
+{word: "せきわけ⓪", meaning: "（相扑）关胁（级别仅次于横纲和大关）"},
+{word: "ひらまく⓪", meaning: "（相扑）平幕（幕内级别中非横纲、大关、关胁、小结的力士）"},
+{word: "たおす②", meaning: "（用力）推倒；战胜，打败；打倒"},
+{word: "きんぼし①", meaning: "指相扑比赛中平幕级力士打败横纲"},
+{word: "きょたい⓪", meaning: "庞大的身体"},
+{word: "あいきょう③", meaning: "讨人喜欢；可爱；魅力"},
+{word: "ふくめる③", meaning: "包含；包括；嘱咐；告知"},
+{word: "いんたい⓪", meaning: "引退；退职；辞职"},
+{word: "テレビ·コマーシャル⓪-②", meaning: "电视商业广告（television commercial）"},
+{word: "すえ⓪", meaning: "末尾；末了；结局；最后"},
+{word: "きか①", meaning: "加入（某国）国籍；（生物）归化"},
+{word: "おやかた③④", meaning: "（相扑的）相扑部屋的掌门人，师傅；（手艺人的）师傅；老板；头目"},
+{word: "せんくしゃ③", meaning: "先驱；先行者"},
+{word: "かたる⓪", meaning: "讲述；谈论"}
+                ],
+                "L4U1Text": [
+{word: "いちじきこく④", meaning: "短期回国；临时回国"},
+{word: "らいにち⓪", meaning: "（外国人）来到日本"},
+{word: "じょせいせんようしゃ⑥", meaning: "（日本列车中的）女性专用车厢"},
+{word: "せんよう⓪", meaning: "专用，专享"},
+{word: "かまう②", meaning: "（一般下接否定）（不）管；（不）顾；（不）介意"},
+{word: "ひとめ⓪", meaning: "众人的视线；他人的看法；他人的目光"},
+{word: "よく①", meaning: "居然；竟能"},
+{word: "とうちゃく⓪", meaning: "到达；抵达"},
+{word: "あがる⓪", meaning: "上到～去；升起，升高；进入房间"},
+{word: "さあさあ①-①", meaning: "（用于表示催促；劝诱)请；快请；喂喂"},
+{word: "これはこれは⓪", meaning: "哎呀；呀呀"},
+{word: "おうせつま⓪", meaning: "客厅；会客室"},
+{word: "かける②", meaning: "坐；坐下"},
+{word: "ソファー①", meaning: "沙发（sofa）"},
+{word: "こしかける④", meaning: "坐；坐下"},
+{word: "ごういん⓪", meaning: "强行；强制"},
+{word: "そういえば④", meaning: "那么说来；那么一说"},
+{word: "たくましい④", meaning: "强壮（的）；健壮（的）；旺盛（的）"},
+{word: "かたくるしい⑤", meaning: "拘谨（的）；死板（的）；郑重其事（的）"},
+{word: "つい①", meaning: "不知不觉；无意中"}
+                ],
+                "L4U2Text": [
+{word: "しゃない①", meaning: "车内"},
+{word: "たびたび⓪", meaning: "屡次；经常；再三"},
+{word: "とうの①", meaning: "该；此；本"},
+{word: "しゅうい①", meaning: "周围；四周；周围的人"},
+{word: "めにはいる①-①", meaning: "看到；看在眼里；映入眼帘"},
+{word: "へいき⓪", meaning: "无动于衷；不在乎；冷静"},
+{word: "ゆれる⓪", meaning: "摇晃；摇动；颠簸"},
+{word: "きよう①", meaning: "灵巧；手巧；巧妙"},
+{word: "みょう①", meaning: "奇怪；不可思议；特别"},
+{word: "かんしん⓪", meaning: "佩服；赞同；赞美"},
+{word: "めにつく①-①", meaning: "引人注目；显眼"},
+{word: "たいだん⓪", meaning: "对谈；会谈"},
+{word: "のる⓪", meaning: "登载；记载"},
+{word: "ひはんてき⓪", meaning: "批判性的；批判"},
+{word: "ぜんぱん⓪", meaning: "普遍；整个；全盘"},
+{word: "おくゆかしい⑤", meaning: "文雅（的）；品格高雅（的）；雅致（的）"},
+{word: "はじらい⓪③", meaning: "害羞；羞涩"},
+{word: "けいい①", meaning: "敬意"},
+{word: "じょうきゃく⓪", meaning: "乘客"},
+{word: "かかわり⓪", meaning: "关联；关系"},
+{word: "せんびき⓪④", meaning: "划线；划线；区分"},
+{word: "なす①", meaning: "构成；形成；创造"},
+{word: "といかける④⓪", meaning: "询问；打听"},
+{word: "おおやけ⓪", meaning: "公家；公共；公开"},
+{word: "つねに①", meaning: "经常；平常"},
+{word: "ふるまう③", meaning: "行动；动作"},
+{word: "しゅちょう⓪", meaning: "主张；论点"},
+{word: "こんぽんてき⓪", meaning: "根本性的；从根本上"},
+{word: "ずれ②", meaning: "分歧；不一致；差距"},
+{word: "ていか⓪", meaning: "降低；下降；低落"},
+{word: "してき⓪", meaning: "指出；指点；指摘"},
+{word: "ようい⓪", meaning: "容易；简单；轻易"},
+{word: "ゆか⓪", meaning: "地板；床铺；寝床"},
+{word: "すわりこむ④", meaning: "坐下；坐着不走"},
+{word: "～こむ", meaning: "进入；（表示深入）深～；陷入～"},
+{word: "カップめん③", meaning: "碗（桶）装方便面"},
+{word: "まで", meaning: "（表示极端的事例）甚至；连"},
+{word: "きにかける⓪-②", meaning: "介意；放在心上"},
+{word: "もちこむ⓪③", meaning: "带进；拿到；提出"},
+{word: "どうどう③⓪", meaning: "（连体形为「堂々たる」，连用形为「堂々と」）堂堂；公然；无所顾忌"},
+{word: "ひんしゅくをかう⓪-⓪", meaning: "招人讨厌；让人瞧不起"},
+{word: "ひんしゅく⓪", meaning: "皱眉；颦蹙"},
+{word: "すくなからず④", meaning: "不少；很多"},
+{word: "じじつ①", meaning: "事实"},
+{word: "こうした⓪", meaning: "这些；这样的"},
+{word: "いちれん⓪", meaning: "一系列；一连串"},
+{word: "げんしょう⓪", meaning: "现象"},
+{word: "すなわち②", meaning: "即；也就是说；换言之"},
+{word: "かって⓪", meaning: "随便；随意；任意"},
+{word: "しかしながら④", meaning: "然而；但是；可是"},
+{word: "ふすま③②⓪", meaning: "隔扇"},
+{word: "こ①", meaning: "个体；个人；单独"},
+{word: "ふるまい⓪", meaning: "举止；动作"},
+{word: "かんさつ⓪", meaning: "观察；察看"},
+{word: "みかける⓪③", meaning: "看见，偶然看见；看见过"}
+                ],
+                "L5U1Text": [
+{word: "マリー①", meaning: "（人名）玛丽（法语Marie）"},
+{word: "チャリヤー①", meaning: "（人名）恰丽娅（泰语carya）"},
+{word: "ツアー①", meaning: "旅行；团体旅游（tour）"},
+{word: "とうだいじ①", meaning: "东大寺（位于日本奈良）"},
+{word: "しゅうがくりょこう⑤", meaning: "修学旅行（日本中小学教育活动的一环，学生在老师的带领下集体出游，通过参观、体验等获得各方面知识。）"},
+{word: "ざせき⓪", meaning: "座位"},
+{word: "きちょうひん⓪", meaning: "贵重物品"},
+{word: "こうふくじ①", meaning: "兴福寺（位于日本奈良）"},
+{word: "おぼうさん⓪", meaning: "僧侣；僧人；小男孩儿"},
+{word: "はいかん⓪", meaning: "参观；参拜"},
+{word: "さつえい⓪", meaning: "摄影；照相"},
+{word: "いんしょく⓪①", meaning: "饮食；吃喝"},
+{word: "かた①", meaning: "肩；肩膀"},
+{word: "すくめる⓪③", meaning: "缩；畏缩"},
+{word: "すごすご①", meaning: "垂头丧气地；沮丧地"},
+{word: "とうしょうだいじ⑤", meaning: "唐招提寺（位于日本奈良）"},
+{word: "がんじんわじょう①⑤", meaning: "（人名）鉴真和尚（688-763）"},
+{word: "わじょう①", meaning: "和尚；僧人"},
+{word: "そうなん⓪", meaning: "遇难；遇险"},
+{word: "しつめい⓪", meaning: "失明"},
+{word: "たどりつく④", meaning: "经跋涉、克服艰难险阻后到达"},
+{word: "ぶっきょう①", meaning: "佛教"},
+{word: "やくがく⓪②", meaning: "药学；药物学"},
+{word: "きよみずでら⓪", meaning: "清水寺（位于日本京都）"},
+{word: "くばる②", meaning: "分发；分送；分布"},
+{word: "うらない⓪", meaning: "占卦；算命；卜者"},
+{word: "こい①", meaning: "恋爱；爱情"},
+{word: "あわてる⓪", meaning: "急急忙忙；惊慌；着慌；慌慌张张"},
+{word: "おう⓪", meaning: "赶；追赶；追求"}
+                ],
+                "L5U2Text": [
+{word: "へいじょうきょう③", meaning: "平成京（日本奈良时代都城，位于现日本奈良市及大和郡山市）"},
+{word: "うつす②", meaning: "迁移；搬迁；移动；挪动"},
+{word: "せんねん①", meaning: "千年"},
+{word: "しゅんかしゅうとう①-⓪", meaning: "春夏秋冬"},
+{word: "ひとりたび③", meaning: "独自旅行"},
+{word: "みちづれ⓪", meaning: "旅伴；同行；搭档"},
+{word: "あるなし①", meaning: "有无；有没有"},
+{word: "ときどき②", meaning: "不同时节；每个时节"},
+{word: "いちぼくいっそう②-⓪", meaning: "一草一木"},
+{word: "とおり③", meaning: "大街；马路；通行"},
+{word: "ごばんのめ⑤", meaning: "围棋盘的格子"},
+{word: "ごばん⓪", meaning: "（围棋的）棋盘"},
+{word: "あがる⓪", meaning: "（在京都特指）向北走"},
+{word: "おおどおり③", meaning: "大路；大道；大街"},
+{word: "さがる②", meaning: "（在京都特指）向南走"},
+{word: "にしいる③", meaning: "西行；往西走"},
+{word: "とうざいなんぼく⑤", meaning: "东南西北"},
+{word: "ところが③", meaning: "可是；然而；不过"},
+{word: "かんかく⓪", meaning: "感觉"},
+{word: "みにつく⓪-①", meaning: "掌握；（知识、技术等）学到手"},
+{word: "みぎひだり②⓪", meaning: "左右"},
+{word: "ながねん⓪", meaning: "长年；漫长的岁月"},
+{word: "しのぶ②⓪", meaning: "回忆；怀念；缅怀"},
+{word: "かなざわ②", meaning: "（地名）金泽（位于日本石川县）"},
+{word: "はき①", meaning: "（地名）荻（位于日本山口县）"},
+{word: "そのもの④③", meaning: "（接在体言之后）其本身；极其；非常"},
+{word: "しげん①", meaning: "资源"},
+{word: "こうそうビル⑤", meaning: "高层建筑；高楼大厦"},
+{word: "こうそう⓪", meaning: "高层"},
+{word: "ほぞん⓪", meaning: "保存"},
+{word: "じゅうみん⓪", meaning: "居民；住户"},
+{word: "がわ⓪", meaning: "一侧；一方；方面；立场；旁边"},
+{word: "ごうい①⓪", meaning: "同意；商量好；意见一致"},
+{word: "こうりょ①", meaning: "考虑"},
+{word: "かせん①", meaning: "河川；河流"},
+{word: "うめたてる④", meaning: "填埋；填平（坑洼地、河海的一部分）；填海造地"},
+{word: "こうそくどうろ⑤", meaning: "高速公路"},
+{word: "りんりつ⓪", meaning: "林立"},
+{word: "さんぴ①", meaning: "赞成与否；赞成和反对"},
+{word: "ともかく①", meaning: "姑且不论；总之；无论如何"},
+{word: "まちなみ⓪", meaning: "城市；城市建筑，城市风貌"},
+{word: "じょうれい⓪", meaning: "条例；条款"},
+{word: "たる①", meaning: "（古代日语判断词「たり」的连体形）表示具有某种资格，同「である」"},
+{word: "なみ②", meaning: "波浪；浪潮；潮流"},
+{word: "よせる⓪", meaning: "靠近；迫近；涌来"},
+{word: "コンクリートづくり⑦", meaning: "混凝土造（的）"},
+{word: "コンクリート④", meaning: "混凝土（concrete）"},
+{word: "～づくり", meaning: "（用～）作的；制作"},
+{word: "モダン⓪", meaning: "现代的；时髦的；流行的（modern）"},
+{word: "ていえん⓪", meaning: "庭园"},
+{word: "たよる②", meaning: "依靠；投靠；拄（拐杖）"},
+{word: "ほしゅてき⓪", meaning: "保守的"},
+{word: "けいかん⓪", meaning: "景观；景致；景色"},
+{word: "きんかくじ①", meaning: "金阁寺（位于日本京都）"},
+{word: "おどろき⓪④", meaning: "吃惊；惊异；惊恐"},
+{word: "うらおもて⓪", meaning: "表里；表面和里面；正反两面；表里不一"},
+{word: "だいとうじだい⑤", meaning: "大唐时代"},
+{word: "ちょうあん①", meaning: "（地名）长安"},
+{word: "ほんけ①", meaning: "本家；正宗"},
+{word: "たいりく⓪①", meaning: "大陆"},
+{word: "ふるきよき①", meaning: "（文言）古老而美好（的）"},
+{word: "ぜつみょう⓪", meaning: "绝妙"},
+{word: "バランス⓪", meaning: "平衡；均衡（balance）"},
+{word: "はるか①", meaning: "遥远；远远；远方"},
+{word: "はせる②", meaning: "驱（车）；策（马）；驰名；缅怀"}
+         ],
+                "L6U1Text": [
+{word: "もりやま⓪", meaning: "（姓）森山"},
+{word: "じょしゅ⓪", meaning: "助手"},
+{word: "ちゃしつ⓪", meaning: "茶室；茶道专用房间"},
+{word: "とおす①", meaning: "将～带进房间"},
+{word: "ちょうだい③", meaning: "（「もらう」的礼貌说法）领受；得到；（「～てください」的礼貌说法）请～"},
+{word: "いちれい⓪", meaning: "鞠躬"},
+{word: "くつろぐ③", meaning: "放松；松弛"},
+{word: "くふうちゃ②", meaning: "功夫茶"},
+{word: "かおり⓪", meaning: "香气；芳香"},
+{word: "ちゃわん⓪", meaning: "茶碗；饭碗"},
+{word: "ふっけんしょう③", meaning: "（地名）福建省"},
+{word: "ちょうしゅん①", meaning: "（地名）长春"},
+{word: "とれる②", meaning: "能收获，能生产，产"},
+{word: "かんそう⓪", meaning: "干燥；枯燥"},
+{word: "みずや⓪", meaning: "（茶室）洗茶具的地方；水房"},
+{word: "あらあら①", meaning: "哎呀呀"},
+{word: "われる⓪", meaning: "破碎；摔碎；开裂"},
+{word: "はなす②", meaning: "使～离开；隔开"},
+{word: "かえる⓪", meaning: "交换；替换；让～代替"},
+{word: "おもむき⓪", meaning: "风趣；特色；旨趣；大意"},
+{word: "あじわう③⓪", meaning: "品尝（味道）；玩味；体验"}
+                ],
+                "L6U2Text": [
+{word: "わけいせいじゃく④", meaning: "（日本茶道精神的四种境界）和敬清寂"},
+{word: "りきゅう①", meaning: "（人名）千利休"},
+{word: "となえる③", meaning: "倡导；声明了（有节奏地）念；诵"},
+{word: "よじ①", meaning: "四个字"},
+{word: "しゅうやく⓪", meaning: "汇集；集约；总括"},
+{word: "なかよく①", meaning: "关系好；友好（地）"},
+{word: "わしあう③", meaning: "和睦"},
+{word: "うやまいあう⑤", meaning: "互相尊敬"},
+{word: "あやまり④③", meaning: "错误"},
+{word: "ごとく①", meaning: "如同；有如"},
+{word: "きよらか②", meaning: "清澈；洁净；纯洁；清爽"},
+{word: "めにみえる①-②", meaning: "肉眼看到的；可以看见的"},
+{word: "ズボン②①", meaning: "裤子（法语jupon）"},
+{word: "ふくそう⓪", meaning: "服装"},
+{word: "どろ②", meaning: "泥；泥土；（俗）小偷"},
+{word: "ほこり⓪", meaning: "尘埃；尘土；灰尘"},
+{word: "はらう②", meaning: "掸除；掸掉；支付；付款"},
+{word: "ぞうきん⓪", meaning: "抹布"},
+{word: "ふきとる③", meaning: "擦去；拭去"},
+{word: "あんがい①", meaning: "意外；没想到"},
+{word: "おそらく②", meaning: "恐怕；大概；或许"},
+{word: "よごれ⓪", meaning: "脏；污垢"},
+{word: "くもり③", meaning: "阴影；灰暗的一面；阴天；多云"},
+{word: "とりのぞく⓪④", meaning: "除掉；清除；拆除"},
+{word: "きよめる③", meaning: "洗净；洗清（罪名等）；雪耻"},
+{word: "どういう①", meaning: "怎样的；哪样的"},
+{word: "どうじる⓪③", meaning: "（感情）动摇；慌张；松动；晃动；稳不住神"},
+{word: "みらい①", meaning: "未来；将来"},
+{word: "いきなり⓪", meaning: "突然；冷不防；立刻"},
+{word: "ハッと⓪①", meaning: "（突然想起）突然；一下子；（因为意外的事而吃惊）吓了一跳"},
+{word: "なげく②", meaning: "叹息；叹气；悲伤"},
+{word: "はじをかく②-①", meaning: "丢脸；出丑"},
+{word: "はじ②", meaning: "羞耻；耻辱"},
+{word: "あらかじめ⓪", meaning: "预先；先；事先；事前"},
+{word: "おてまえ②", meaning: "（茶道的）礼法"},
+{word: "おうよう⓪", meaning: "应用；适用；运用"},
+{word: "じっこう⓪", meaning: "实行；实践"},
+{word: "こころがまえ④", meaning: "精神上的准备；思想准备"},
+{word: "せんそうしつ③", meaning: "（人名）千宗室"},
+{word: "うらせんけ③", meaning: "里千家（日本茶道流派之一）"}
+                ],
+                "L7U1Text": [
+{word: "だんわしつ①", meaning: "谈话室"},
+{word: "おおや①", meaning: "房东；正房；上房"},
+{word: "いただきもの⓪", meaning: "别人给的东西"},
+{word: "ほんの⓪", meaning: "一点点；仅仅；只不过"},
+{word: "おかえし⓪", meaning: "答谢的礼品；（商店给顾客）找回的钱；汇报；报复"},
+{word: "ぶつぶつこうかん⑤", meaning: "物物交换，以物易物"},
+{word: "なんだか①", meaning: "总觉得；总有点；不知为何"},
+{word: "せいい①", meaning: "诚意，诚心"},
+{word: "じもと⓪", meaning: "老家；当地"},
+{word: "なんて①", meaning: "～什么（的）；～之类（的）"},
+{word: "タイミング⓪", meaning: "时间节点；时机；机遇；时候（timing）"},
+{word: "なんで①", meaning: "为什么"},
+{word: "ホストファミリー④", meaning: "（接受外国人住宿生活的）主人家；东道主家；寄宿家庭（host family）"},
+{word: "いつまでも①", meaning: "到什么时候也；永远；老是"},
+{word: "さいそく①", meaning: "催促"},
+{word: "きんじょ①", meaning: "附近；周围；四邻"},
+{word: "もらいっぱなし⓪", meaning: "只是收取；接受礼物而不还礼"},
+{word: "～っぱなし", meaning: "某种行为之后的状态一直持续不变；置之不理"},
+{word: "ふたん⓪", meaning: "负担"},
+{word: "わざとらしい⑤", meaning: "故意；不自然；造作"},
+{word: "こうか①", meaning: "高价；昂贵"},
+{word: "きょうしゅく⓪", meaning: "（表示客气或谢意）过意不去；惶恐；惭愧"},
+{word: "たべきる③", meaning: "吃完；吃光"},
+{word: "～きる", meaning: "完成；完结；（程度达到极限）非常；极其"},
+{word: "まさつ⓪", meaning: "摩擦；阻力；抵抗；不和睦"},
+{word: "もっとも③", meaning: "话虽如此；不过；可是"},
+{word: "なにごと⓪", meaning: "什么事情；何事"},
+{word: "しゅっせばらい④", meaning: "暂时先不还钱（礼），等将来有了出息再还"},
+{word: "しゅっせ⓪", meaning: "（在社会上）出人头地；成功；出息；出头；露脸"},
+{word: "とうし⓪①", meaning: "投资"}
+                ],
+                "L7U2Text": [
+{word: "きこう⓪", meaning: "旅行记；游记"},
+{word: "たわらまち①-①", meaning: "（人名）（日本和歌诗人）俵万智（1962-）"},
+{word: "もちいる③⓪", meaning: "使用；采用；任用"},
+{word: "つくりあげる⑤", meaning: "制成；制定；塑造"},
+{word: "みをおく⓪-⓪", meaning: "置身"},
+{word: "ぜんかい①⓪", meaning: "前一回，上一次"},
+{word: "あさいち②③", meaning: "早市"},
+{word: "やくにたつ②-①", meaning: "有用处；有帮助；有益；发挥作用"},
+{word: "きをよくする⓪-①", meaning: "觉得高兴；心情愉快"},
+{word: "よう①", meaning: "要点；要领；主要"},
+{word: "どきょう①", meaning: "胆量"},
+{word: "しっぱいだん③", meaning: "失败之谈"},
+{word: "きりがない②-①", meaning: "没完没了；没有止境"},
+{word: "きり②", meaning: "限度；终结"},
+{word: "しせい⓪①", meaning: "（汉语拼音的）四声；声调"},
+{word: "あげさげ②", meaning: "上下；抑扬；起落；涨落"},
+{word: "なんと①", meaning: "居然；怎么，如何"},
+{word: "しりあがり③", meaning: "语尾声调高；升调；事情越往后越好"},
+{word: "たいら⓪", meaning: "平坦；平静；心平气和"},
+{word: "あいなる①", meaning: "（「なる」的郑重说法）变成；成为"},
+{word: "かたこと⓪", meaning: "只言片语；不完全的话语"},
+{word: "まこと⓪", meaning: "真实；事实；实在；诚然"},
+{word: "あるいは②", meaning: "也许；说不定；或；或者"},
+{word: "いきさき⓪", meaning: "（也读作「ゆきさき」）目的地；去的地方"},
+{word: "つげる⓪", meaning: "告诉；告知；通知"},
+{word: "すいどう⓪", meaning: "自来水（管）"},
+{word: "はっする⓪", meaning: "发生；出发；发出；发布"},
+{word: "ほうそく⓪", meaning: "法则；规律；定律"},
+{word: "つたわる③", meaning: "传达；流传"},
+{word: "てざわり②", meaning: "手感"},
+{word: "ひっし⓪", meaning: "拼命；殊死"},
+{word: "さっかく⓪", meaning: "错觉"},
+{word: "けっして⓪", meaning: "决（不）；决（非）；绝对（不）"},
+{word: "げんしてき⓪", meaning: "原始（的）"},
+{word: "どうよう⓪", meaning: "同样；一个样"},
+{word: "つくづく②", meaning: "仔细；痛切；深切"},
+{word: "いってい⓪", meaning: "固定；一定；规定"},
+{word: "もとづく③", meaning: "根据；基于；按照"},
+{word: "きごう⓪", meaning: "记号；符号"},
+{word: "しばしば①", meaning: "屡次；每每"},
+{word: "ほんらい①", meaning: "本来；原来；通常"},
+{word: "かする②", meaning: "化为；变成"},
+{word: "しょせん⓪", meaning: "归根结底；结局；反正；终归"},
+{word: "たかが①②", meaning: "不过是；至多"},
+{word: "おそろしい④", meaning: "恐怖；敬畏；（程度令人）惊讶万分"},
+{word: "こうしゅう①", meaning: "（地名）杭州"},
+{word: "れっしゃ⓪①", meaning: "火车；列车"},
+{word: "むかい⓪", meaning: "对面；对过"},
+{word: "くみ②", meaning: "对；组；套"},
+{word: "ふう①", meaning: "样子；态度"},
+{word: "みうける⓪③", meaning: "看到；看见；看起来"},
+{word: "はやくち②", meaning: "说话快；最快"},
+{word: "ききとる③", meaning: "听见；听懂；听取"},
+{word: "きょうをそそる⓪-⓪", meaning: "引起兴趣"},
+{word: "きょう⓪", meaning: "兴致；兴味；乐趣"},
+{word: "そそる⓪", meaning: "引起；勾起"},
+{word: "ごく①", meaning: "非常；极其；最"},
+{word: "じつに②", meaning: "实在；确实；真"},
+{word: "いいあらそう⑤", meaning: "口角；争吵；争论"},
+{word: "くちょう⓪", meaning: "语调；声调；强调"},
+{word: "はっと①⓪", meaning: "突然；猛地；吃惊"},
+{word: "こわばる③", meaning: "发硬；变僵硬"},
+{word: "しばし①", meaning: "暂时；片刻"},
+{word: "ちんもく⓪", meaning: "沉默"},
+{word: "スーッと①", meaning: "（多为「すっと」）迅速地；轻快地；一下子"},
+{word: "ながれる③", meaning: "流；流动；流于；传播；趋向"},
+{word: "かいす①", meaning: "解释；解答；理解"},
+{word: "なぐる②", meaning: "殴打；打；揍"},
+{word: "ける①", meaning: "踢"},
+{word: "おもみ⓪", meaning: "重量；分量；重要性"},
+{word: "みるみる①", meaning: "眼看着"},
+{word: "きずつく③", meaning: "受伤；受到创伤"},
+{word: "いこく⓪", meaning: "异国；外国"},
+{word: "しょうじょ①", meaning: "少女"},
+{word: "よつば⓪", meaning: "四叶草"},
+{word: "エッセイ①", meaning: "随笔；小品文；短论文（essay）"},
+{word: "かわでしょぼうしんしゃ⑦", meaning: "（日本一家出版社名）河出书房新社"},
+{word: "しょぼう⓪", meaning: "书房；书斋；书店；出版社"}
+                ],
+                "L8U1Text": [
+{word: "こうえい⓪", meaning: "光荣，荣幸；荣誉"},
+{word: "あおき⓪", meaning: "（姓）青木"},
+{word: "オービー③", meaning: "毕业生；老小孩（old boy）"},
+{word: "わかて⓪", meaning: "年轻少壮的人；年轻人"},
+{word: "アニメかんとく④", meaning: "动漫导演"},
+{word: "かんとく⓪", meaning: "导演；教练；监考；监督"},
+{word: "くろさわ⓪", meaning: "（姓）黑泽"},
+{word: "～し", meaning: "先生；氏"},
+{word: "はらだ①", meaning: "（姓）原田"},
+{word: "きょうじゅ⓪", meaning: "教授；讲授"},
+{word: "きゅうゆう⓪", meaning: "同班同学；同年级同学"},
+{word: "じむしょ②", meaning: "办公室；事务所"},
+{word: "けん①", meaning: "事；事情"},
+{word: "きょうせい⓪", meaning: "共生；共存"},
+{word: "はいる①", meaning: "含有；列入；有～安排（如「会議が入る」「予定が入る」）；进入"},
+{word: "ちょうせい⓪", meaning: "调整；调节"},
+{word: "ひきうける④", meaning: "接受；承担；答应"},
+{word: "あす②", meaning: "明天"},
+{word: "とうじつ⓪①", meaning: "当天"},
+{word: "しんぼくかい④⓪", meaning: "联谊会；联欢会"},
+{word: "はいちょう⓪", meaning: "（「聞く」的自谦语）聆听"},
+{word: "さきほど⓪", meaning: "方才；刚才"},
+{word: "さしつかえる⑤④⓪", meaning: "妨碍；抵触"},
+{word: "～むけ", meaning: "面向～；以～为对象"},
+{word: "それはそれは⓪", meaning: "哎呀；呀呀（表示吃惊、感叹）"},
+{word: "こくせき⓪", meaning: "国籍"},
+{word: "こだわる③", meaning: "拘泥；讲究；追求"}
+                ],
+                "L8U2Text": [
+            {word: "ざっかんき③", meaning: "杂感笔记"},
+            {word: "ざっかん⓪", meaning: "杂感"},
+            {word: "ヒットさく③", meaning: "成功之作；主打作品"},
+            {word: "ヒット①", meaning: "获得好评；（棒球的）安打（hit）"},
+            {word: "～さく", meaning: "作品"},
+            {word: "こどもっぽい⑤", meaning: "孩子气；幼稚"},
+            {word: "～っぽい", meaning: "表示具有某种倾向"},
+            {word: "どうせ⓪", meaning: "反正；终归；无论如何"},
+            {word: "スケジュールちょう⓪", meaning: "记事本"},
+            {word: "いいかける④", meaning: "开始说；说起；话说一半"},
+            {word: "さっさと①", meaning: "赶快；赶紧；迅速地"},
+            {word: "とたん⓪", meaning: "恰好在～的时候；刚一～的时候"},
+            {word: "おおよろこび③", meaning: "非常高兴"},
+            {word: "わくわく①", meaning: "激动；紧张；不安"},
+            {word: "はしゃぐ⓪②", meaning: "喧闹；欢闹"},
+            {word: "るすばん⓪", meaning: "看家；看家人"},
+            {word: "なぜか①", meaning: "不知为什么；不知什么原因"},
+            {word: "いそいそ①", meaning: "高高兴兴地；急急忙忙地"},
+            {word: "したく⓪", meaning: "准备；预备"},
+            {word: "てんじ⓪", meaning: "展示；展览"},
+            {word: "にっこり③", meaning: "微微一笑"},
+            {word: "ずらり②", meaning: "成排的；一排的；一串儿的"},
+            {word: "すでに①", meaning: "已经；业已"},
+            {word: "にぎわう③", meaning: "热闹；兴隆；兴旺"},
+            {word: "てわたす③⓪", meaning: "递给"},
+            {word: "ダンスパフォーマンス⑤", meaning: "舞蹈表演（dance performance）"},
+            {word: "パフォーマンス②", meaning: "表演；演出；余兴（performance）"},
+            {word: "やたい①", meaning: "（在路边等处售货的）货摊；（庙会等临时搭设的）演出棚；路边摊"},
+            {word: "めぐる⓪", meaning: "巡游；周游；绕行；围绕；（再度）轮到"},
+            {word: "おわらいライブ⓪", meaning: "喜剧小品演出；搞笑节目直播"},
+            {word: "じこく①", meaning: "时刻；时间"},
+            {word: "じょうない①", meaning: "场内"},
+            {word: "まもなく②", meaning: "不久；很快；一会儿"},
+            {word: "きえい⓪", meaning: "朝气蓬勃"},
+            {word: "さっそう⓪", meaning: "飒爽；潇洒（连体形为「さっそうたる」，连用形为「さっそうと」）"},
+            {word: "にぎりしめる⑤", meaning: "握紧；紧抓住不放"},
+            {word: "いつしか①", meaning: "不知不觉地"},
+            {word: "ひきこむ③", meaning: "吸引；拉进来；拉拢入伙"},
+            {word: "きょうぞん⓪", meaning: "共存；共处"},
+            {word: "きょうい①", meaning: "威胁；胁迫"},
+            {word: "ひしひし①②", meaning: "紧紧地；深深地"},
+            {word: "ごらく⓪", meaning: "娱乐"},
+            {word: "じいんと⓪", meaning: "（多作「じんと」）深受感动状"},
+            {word: "ほほえむ③", meaning: "微笑"},
+            {word: "うなずく③⓪", meaning: "点头"},
+            {word: "わんしょう⓪", meaning: "臂章；袖标；袖章"},
+            {word: "せいねん⓪", meaning: "青年"},
+            {word: "とびこむ③", meaning: "跳入；闪身跃入；冲入；积极投身于"},
+            {word: "つつ", meaning: "边～边～"},
+            {word: "よびかける④", meaning: "打招呼；呼唤；叫"},
+            {word: "てきぱき①", meaning: "麻利；敏捷；爽快"},
+            {word: "ゆうどう⓪", meaning: "引导；诱导；导致"},
+            {word: "あとにする①-⓪", meaning: "离开；推迟；放到后头"},
+            {word: "すがすがしい⑤", meaning: "清爽；神清气爽"},
+            {word: "あきぞら③", meaning: "秋天的天空"},
+            {word: "ほんのり③", meaning: "微微；稍微"},
+            {word: "ゆうやけ⓪", meaning: "晚霞"},
+            {word: "そまる⓪", meaning: "染上；染色"},
+            {word: "ぜんじつ⓪", meaning: "前一天"},
+            {word: "リハーサル②⓪", meaning: "彩排（rehearsal）"},
+            {word: "トラブル②", meaning: "麻烦；困难；纠纷（trouble）"},
+            {word: "ピリピリ①", meaning: "神经紧张；神经过敏"},
+            {word: "うんえい⓪", meaning: "运营；运作；经营"}
+                ],
+                "L9U1Text": [
+{word: "せいげん③", meaning: "限制；约束"},
+{word: "ぜひ①", meaning: "是非；是与非；对与错"},
+{word: "パネルディスカッション⑥", meaning: "专题讨论会（panel discussion）"},
+{word: "むらかみ⓪", meaning: "（姓）村上"},
+{word: "ただいま②", meaning: "现在；刚才；马上"},
+{word: "しょくぎょうがら⓪", meaning: "职业性质；职业的原因"},
+{word: "～がら", meaning: "身份；性质；品格"},
+{word: "しめん①", meaning: "版面；报纸上；篇幅"},
+{word: "いらだち⓪", meaning: "焦躁；急躁"},
+{word: "ビジネス①", meaning: "商业；商务；业务；买卖（business）"},
+{word: "れいにとる①-①", meaning: "作为例子；以～为例"},
+{word: "サスティナブル⑤", meaning: "可持续发展（的）（sustainable）"},
+{word: "アサイン②", meaning: "任命；分配（assign）"},
+{word: "わりあて⓪", meaning: "分担；分配"},
+{word: "いっしん⓪", meaning: "使～一新；革新；刷新"},
+{word: "はかる②", meaning: "谋求；策划；图谋"},
+{word: "いかがなものか②", meaning: "（委婉的疑问和批判）不合适；不可靠"},
+{word: "こばやし②⓪", meaning: "（姓）小林"},
+{word: "かいご①", meaning: "护理；照顾；帮助；看护"},
+{word: "しえん⓪①", meaning: "支援；援助"},
+{word: "がいねん①", meaning: "概念"},
+{word: "ターミナルケア⑥", meaning: "临终关怀，临终照护（terminal care）"},
+{word: "カンファレンス①", meaning: "专家会诊；学术会议（conference）"},
+{word: "としより③④", meaning: "老人"},
+{word: "おじいちゃん②", meaning: "爷爷；姥爷；老爷爷"},
+{word: "よのなか②", meaning: "世上；世间；社会"},
+{word: "みなおし⓪", meaning: "重新认识；重新评价；重看"},
+{word: "へんかん⓪", meaning: "改变；转变；变换"},
+{word: "きゅうむ①", meaning: "当务之急；紧急任务"},
+{word: "はせがわ⓪", meaning: "（姓）长谷川"},
+{word: "ながい①", meaning: "（姓）永井"},
+{word: "そのまま④⓪", meaning: "照原样；原封不动"},
+{word: "こらい①", meaning: "自古以来"},
+{word: "たいりょう⓪", meaning: "大量"},
+{word: "かんご⓪", meaning: "（日语中的）汉字音读词"},
+{word: "わご①", meaning: "日本固有的词；和语词"},
+{word: "どくじ①⓪", meaning: "独自；独特；个人"},
+{word: "くわわる⓪③", meaning: "加入；参加"},
+{word: "バリエーション③", meaning: "变化；变异；变种（variation）"},
+{word: "ユニーク②", meaning: "独特；唯一；无比（unique）"},
+{word: "あえて①", meaning: "硬是；勉强；（下接否定语）并不；未必；不见得"},
+{word: "しょうち⓪", meaning: "知道；明知；答应；同意"},
+{word: "とくてい⓪", meaning: "特别指定；特定"},
+{word: "まかせる③", meaning: "听任；任凭；委托；托付"},
+{word: "こべつ⓪", meaning: "个别；单独；一个个"},
+{word: "フロア②", meaning: "会场；听众席；地板（floor）"},
+{word: "しつぎおうとう②-⓪", meaning: "提问和回答"},
+{word: "しつぎ②①", meaning: "提问"},
+{word: "おうとう⓪", meaning: "回答"}
+                ],
+                "L9U2Text": [
+{word: "グローバルか⓪", meaning: "全球化"},
+{word: "グローバル②", meaning: "全球（性的）；世界（性的）（global）"},
+{word: "しんてん⓪", meaning: "进展，发展"},
+{word: "ぞうか⓪", meaning: "增加"},
+{word: "いちじるしい⑤", meaning: "显著（的）；明显（的）"},
+{word: "はんらん⓪", meaning: "泛滥；失控"},
+{word: "きわめる③⓪", meaning: "极尽；穷尽"},
+{word: "アルファベット④", meaning: "字母，字母表（alphabet）"},
+{word: "あいまい⓪", meaning: "不清晰；委婉"},
+{word: "メーク①", meaning: "（「メークアップ」的省略说法）化妆"},
+{word: "どういつ⓪", meaning: "相同；同一"},
+{word: "いっかん⓪", meaning: "一贯；自始至终贯穿一种态度、方法"},
+{word: "こんらん⓪", meaning: "混乱"},
+{word: "ゆれ⓪", meaning: "动摇；摇摆；波动"},
+{word: "きおく⓪", meaning: "记忆"},
+{word: "げんご⓪", meaning: "（未经翻译的）原语言；源语"},
+{word: "かいり①", meaning: "偏离"},
+{word: "ていちゃく⓪", meaning: "固定；扎根"},
+{word: "かてい⓪", meaning: "过程"},
+{word: "しんちんたいしゃ⑤", meaning: "新陈代谢"},
+{word: "ニュアンス①", meaning: "语感（语气、感情等的微妙差异）（法语nuance）"},
+{word: "いっち⓪", meaning: "一致；符合"},
+{word: "たよう⓪", meaning: "多种用途；多用"},
+{word: "おこす②", meaning: "引起；引发；叫醒"},
+{word: "おそれ⑤", meaning: "（消极的）可能性"},
+{word: "おとしあな③", meaning: "陷阱；坑"},
+{word: "びみょう⓪", meaning: "微妙（的）；无法言说"},
+{word: "はあく⓪", meaning: "把握"},
+{word: "ぼごわしゃ②", meaning: "母语者"},
+{word: "ぼご①", meaning: "母语"},
+{word: "けいはく⓪", meaning: "（言语行为）轻佻，缺乏诚意，不稳重"},
+{word: "たね①", meaning: "种子；根源"},
+{word: "いかに②", meaning: "如何"},
+{word: "むきあう③", meaning: "面对"},
+{word: "ふじん⓪", meaning: "妇女，女性"},
+{word: "キャリアウーマン④", meaning: "职业女性（career woman）"},
+{word: "ローン①", meaning: "贷款（loan）"},
+{word: "いいかえる④③", meaning: "换言之；改变说法"},
+{word: "ざいあくかん④③", meaning: "罪恶感"},
+{word: "ざいあく①", meaning: "罪恶"},
+{word: "うすまる③⓪", meaning: "变淡；变薄"},
+{word: "どじょう⓪", meaning: "土壤"},
+{word: "じゅうなん⓪", meaning: "柔软；灵活"},
+{word: "かんよう⓪", meaning: "宽容；包容"},
+{word: "とらえる③", meaning: "理解；把握；捕捉"},
+{word: "わしゃ①", meaning: "说话的人；说～话的人"}
+                ],
+                "L10U1Text": [
+{word: "でね", meaning: "（「それでね」的省略，语气较为亲近）因此；因而"},
+{word: "かなあ②", meaning: "（表示感叹、疑问）啊；吗"},
+{word: "なかがいい①-①", meaning: "关系好"},
+{word: "ったら", meaning: "（多为女性使用，责备的语气）可真是的"},
+{word: "かんぺき⓪", meaning: "完美无缺"}
+                ],
+                "L10U2Text": [
+{word: "おいえげい③", meaning: "世代相传的技艺；祖传技艺"},
+{word: "せいさん①", meaning: "生产；制造"},
+{word: "いぜん①", meaning: "以前；之前"},
+{word: "うわまわる④①", meaning: "超越；赶超；超过"},
+{word: "となりのトトロ①-①", meaning: "《龙猫》"},
+{word: "ワンピース③", meaning: "《海贼王》"},
+{word: "ドラえもん—", meaning: "《机器猫》《哆啦A梦》"},
+{word: "めいさく①", meaning: "名作"},
+{word: "はくす②", meaning: "博得；获得"},
+{word: "とりわけ①", meaning: "特别；尤其"},
+{word: "てづかおさむ①-①", meaning: "手塚治虫（人名）"},
+{word: "みやざきはやお②-①", meaning: "宫崎骏（人名）"},
+{word: "リスペクト③", meaning: "尊敬；敬意；致敬"},
+{word: "びいしき②", meaning: "审美；审美意识"},
+{word: "しょくにん①", meaning: "匠人；职人"},
+{word: "わざ②", meaning: "技艺；技术"},
+{word: "つくりだす④", meaning: "创作出；设计出"},
+{word: "コンテンツ③①", meaning: "（视频、音频等的）内容"},
+{word: "クールジャパン⑤", meaning: "酷日本（日本独有的动漫流行文化战略）"},
+{word: "せんりゃく①", meaning: "战略"},
+{word: "くみこむ③①", meaning: "加入；编入"},
+{word: "おびやかす④", meaning: "威胁"},
+{word: "おうこく①", meaning: "王国"},
+{word: "かいがいぜい③", meaning: "海外势力；外资"},
+{word: "おくれをとる①-①", meaning: "落后"},
+{word: "くにをあげる①-①", meaning: "全国；举国"},
+{word: "あげる①", meaning: "举；抬起"},
+{word: "バックアップ④", meaning: "支持"},
+{word: "ひやく①", meaning: "飞跃；跨越"},
+{word: "とげる①②", meaning: "完成；达成"},
+{word: "さいゆうきヒーロー・イズ・バック③（整体）", meaning: "《西游记之大圣归来》"},
+{word: "あかきおおうおのでんせつ①-①-①", meaning: "《大鱼海棠》"},
+{word: "ナターまどうこうりん①-①-①", meaning: "《哪吒之魔童降世》"},
+{word: "じこく①①", meaning: "本国"},
+{word: "しんしゅつ①", meaning: "进入（市场等）"},
+{word: "モチーフ②", meaning: "中心思想；主题"},
+{word: "かんきゃく①", meaning: "观众；看客"},
+{word: "しこう①", meaning: "嗜好；喜好"},
+{word: "アレンジ②", meaning: "改编；整合；筹划；安排"},
+{word: "たかまる③", meaning: "升高；高涨"},
+{word: "かんれんビジネス⑤", meaning: "相关经济；延伸经济"},
+{word: "ビジネス①", meaning: "买卖；商务；商业"},
+{word: "あらた①", meaning: "重新；另；新的"},
+{word: "せんたん①", meaning: "尖端；先进"},
+{word: "へだたり①", meaning: "隔离；隔阂"},
+{word: "クオリティー②", meaning: "质量；品质"},
+{word: "せいじゅく①", meaning: "成熟"},
+{word: "けいしょう①", meaning: "继承"},
+{word: "ほご①", meaning: "保护"},
+{word: "じんざい①", meaning: "人才"},
+{word: "いくせい①", meaning: "培养；培育"},
+{word: "かいが①", meaning: "绘画；画作"},
+{word: "かくしん①", meaning: "革新；创新"},
+{word: "てがき①", meaning: "手绘"},
+{word: "せいさく①", meaning: "制作"},
+{word: "しんか①", meaning: "进化"},
+{word: "びょうが①", meaning: "描绘；描画"},
+{word: "マンパワー③", meaning: "劳动力；人力资源"},
+{word: "つくりあげる⑤①", meaning: "创造（完成）；设计（完成）"}
+                ]
+            },
+            // ----- 《综合日语B4》 10课 -----
+            "综合日语B4": {
+                "第1课": [
+                    {word: "しゃかい", meaning: "社会"},
+                    {word: "じんこう", meaning: "人口"},
+                    {word: "もんだい", meaning: "问题"},
+                    {word: "かくさ", meaning: "差距"},
+                    {word: "ふくし", meaning: "福祉"},
+                    {word: "ひんこん", meaning: "贫困"},
+                    {word: "とし", meaning: "城市"},
+                    {word: "のうそん", meaning: "农村"},
+                    {word: "ろうどう", meaning: "劳动"},
+                    {word: "せいさく", meaning: "政策"}
+                ],
+                "第2课": [
+                    {word: "せいじ", meaning: "政治"},
+                    {word: "せんきょ", meaning: "选举"},
+                    {word: "ぎいん", meaning: "议员"},
+                    {word: "せいとう", meaning: "政党"},
+                    {word: "ないかく", meaning: "内阁"},
+                    {word: "ほうあん", meaning: "法案"},
+                    {word: "こくみん", meaning: "国民"},
+                    {word: "みんしゅ", meaning: "民主"},
+                    {word: "けんり", meaning: "权利"},
+                    {word: "ぎむ", meaning: "义务"}
+                ],
+                "第3课": [
+                    {word: "ほうりつ", meaning: "法律"},
+                    {word: "けんぽう", meaning: "宪法"},
+                    {word: "さいばん", meaning: "审判"},
+                    {word: "べんごし", meaning: "律师"},
+                    {word: "はんざい", meaning: "犯罪"},
+                    {word: "ばっそく", meaning: "罚则"},
+                    {word: "けいやく", meaning: "契约"},
+                    {word: "ざいさん", meaning: "财产"},
+                    {word: "けんり", meaning: "权利"},
+                    {word: "ぎむ", meaning: "义务"}
+                ],
+                "第4课": [
+                    {word: "かがく", meaning: "科学"},
+                    {word: "じっけん", meaning: "实验"},
+                    {word: "りろん", meaning: "理论"},
+                    {word: "はっけん", meaning: "发现"},
+                    {word: "いでんし", meaning: "基因"},
+                    {word: "かんきょうもんだい", meaning: "环境问题"},
+                    {word: "エネルギー", meaning: "能量"},
+                    {word: "げんし", meaning: "原子"},
+                    {word: "うちゅう", meaning: "宇宙"},
+                    {word: "しんか", meaning: "进化"}
+                ],
+                "第5课": [
+                    {word: "げいじゅつ", meaning: "艺术"},
+                    {word: "おんがく", meaning: "音乐"},
+                    {word: "かいが", meaning: "绘画"},
+                    {word: "ちょうこく", meaning: "雕刻"},
+                    {word: "えいが", meaning: "电影"},
+                    {word: "えんげき", meaning: "戏剧"},
+                    {word: "ぶんがく", meaning: "文学"},
+                    {word: "し", meaning: "诗"},
+                    {word: "しゃしん", meaning: "照片"},
+                    {word: "デザイン", meaning: "设计"}
+                ],
+                "第6课": [
+                    {word: "てつがく", meaning: "哲学"},
+                    {word: "しそう", meaning: "思想"},
+                    {word: "りんり", meaning: "伦理"},
+                    {word: "そんざい", meaning: "存在"},
+                    {word: "しんり", meaning: "真理"},
+                    {word: "ちしき", meaning: "知识"},
+                    {word: "りせい", meaning: "理性"},
+                    {word: "けいけん", meaning: "经验"},
+                    {word: "かちかん", meaning: "价值观"},
+                    {word: "こうふく", meaning: "幸福"}
+                ],
+                "第7课": [
+                    {word: "ぶんがく", meaning: "文学"},
+                    {word: "しょうせつ", meaning: "小说"},
+                    {word: "しじん", meaning: "诗人"},
+                    {word: "さっか", meaning: "作家"},
+                    {word: "こてん", meaning: "古典"},
+                    {word: "げんだい", meaning: "现代"},
+                    {word: "ずいひつ", meaning: "随笔"},
+                    {word: "ひょうろん", meaning: "评论"},
+                    {word: "ものがたり", meaning: "故事"},
+                    {word: "とうじょうじんぶつ", meaning: "登场人物"}
+                ],
+                "第8课": [
+                    {word: "れきし", meaning: "历史"},
+                    {word: "じだい", meaning: "时代"},
+                    {word: "せんそう", meaning: "战争"},
+                    {word: "へいわ", meaning: "和平"},
+                    {word: "かくめい", meaning: "革命"},
+                    {word: "おうちょう", meaning: "王朝"},
+                    {word: "ぶんかいさん", meaning: "文化遗产"},
+                    {word: "しりょう", meaning: "史料"},
+                    {word: "こうこがく", meaning: "考古学"},
+                    {word: "こふん", meaning: "古坟"}
+                ],
+                "第9课": [
+                    {word: "しゅうきょう", meaning: "宗教"},
+                    {word: "しんこう", meaning: "信仰"},
+                    {word: "ぶっきょう", meaning: "佛教"},
+                    {word: "しんとう", meaning: "神道"},
+                    {word: "キリストきょう", meaning: "基督教"},
+                    {word: "イスラムきょう", meaning: "伊斯兰教"},
+                    {word: "ぎしき", meaning: "仪式"},
+                    {word: "じいん", meaning: "寺院"},
+                    {word: "きょうかい", meaning: "教会"},
+                    {word: "きょうてん", meaning: "经典"}
+                ],
+                "第10课": [
+                    {word: "しんりがく", meaning: "心理学"},
+                    {word: "こころ", meaning: "心"},
+                    {word: "いしき", meaning: "意识"},
+                    {word: "むいしき", meaning: "无意识"},
+                    {word: "がくしゅう", meaning: "学习"},
+                    {word: "きおく", meaning: "记忆"},
+                    {word: "じんかく", meaning: "人格"},
+                    {word: "かんじょう", meaning: "感情"},
+                    {word: "ストレス", meaning: "压力"},
+                    {word: "カウンセリング", meaning: "心理咨询"}
+                ]
+            }
+        };
+
         // ---------- 数据 ----------
         let wordPairs = [];
-        let remainingPairs = [];    // 当前游戏中剩余未匹配的配对
+        let remainingPairs = [];
         let selectedCard = null;
         let startTime, timerInterval, correctCount = 0;
         let gameRunning = false;
@@ -221,13 +1236,65 @@
             {word: "お願いします", meaning: "拜托了"}
         ];
 
-        // 初始化排行榜
+        // ---------- 初始化 ----------
         (function init() {
             if (!localStorage.getItem('wordGameRecords')) localStorage.setItem('wordGameRecords', JSON.stringify([]));
             showLeaderboard();
+            populateBookSelect();
+            if (wordPairs.length === 0) {
+                wordPairs = [...defaultWords];
+                showImportedWords();
+            }
         })();
 
-        // 文件导入
+        // ---------- 内置选择框填充 ----------
+        function populateBookSelect() {
+            const bookSelect = document.getElementById('bookSelect');
+            const books = Object.keys(builtInWords);
+            bookSelect.innerHTML = '<option value="">-- 教材を選択 --</option>';
+            books.forEach(book => {
+                const opt = document.createElement('option');
+                opt.value = book;
+                opt.textContent = book;
+                bookSelect.appendChild(opt);
+            });
+        }
+
+        function onBookChange() {
+            const book = document.getElementById('bookSelect').value;
+            const lessonSelect = document.getElementById('lessonSelect');
+            lessonSelect.innerHTML = '<option value="">-- 課を選択 --</option>';
+            if (book && builtInWords[book]) {
+                const lessons = Object.keys(builtInWords[book]);
+                lessons.forEach(lesson => {
+                    const opt = document.createElement('option');
+                    opt.value = lesson;
+                    opt.textContent = lesson;
+                    lessonSelect.appendChild(opt);
+                });
+            }
+        }
+
+        function onLessonChange() {}
+
+        function loadBuiltInWords() {
+            const book = document.getElementById('bookSelect').value;
+            const lesson = document.getElementById('lessonSelect').value;
+            if (!book || !lesson) {
+                alert('教材と課を選択してください。');
+                return;
+            }
+            if (!builtInWords[book] || !builtInWords[book][lesson]) {
+                alert('指定された単語が見つかりません。');
+                return;
+            }
+            wordPairs = builtInWords[book][lesson].map(item => ({ ...item }));
+            showImportedWords();
+            resetGame();
+            alert(`「${book} - ${lesson}」の単語 ${wordPairs.length} 組を読み込みました。`);
+        }
+
+        // ---------- 文件导入 ----------
         document.getElementById('fileInput').addEventListener('change', handleFile);
         function handleFile(e) {
             const file = e.target.files[0];
@@ -256,6 +1323,7 @@
                         }));
                     if (wordPairs.length === 0) throw new Error('有効なデータが見つかりません');
                     showImportedWords();
+                    resetGame();
                     alert(`成功导入 ${wordPairs.length} 组单词！`);
                 } catch (error) {
                     alert(`ファイルの読み込みに失敗しました: ${error.message}`);
@@ -273,27 +1341,25 @@
             if (wordPairs.length > 30) container.innerHTML += `<div class="word-item">…他 ${wordPairs.length-30} 組</div>`;
         }
 
-        // ---------- 游戏核心 ----------
+        // ---------- 游戏核心（完全不变） ----------
         function startGame() {
             let pool = wordPairs.length ? wordPairs : defaultWords;
             const count = Math.min(10, pool.length);
             const shuffledPool = shuffleArray([...pool]);
             const selected = shuffledPool.slice(0, count);
             if (selected.length === 0) {
-                alert('単語がありません。先にインポートしてください。');
+                alert('単語がありません。先にインポートまたは内置単語を読み込んでください。');
                 return;
             }
-            resetGame();          // 先重置，清空 remainingPairs
-            remainingPairs = selected;  // 再赋值
+            resetGame();
+            remainingPairs = selected;
             gameRunning = true;
             renderGameBoard();
             startTimer();
         }
 
-        // 重新渲染左右列（根据 remainingPairs，左右分别打乱顺序）
         function renderGameBoard() {
             if (!gameRunning && remainingPairs.length > 0) return;
-            // 准备左右卡片数据，分别打乱
             const wordCards = remainingPairs.map((p, idx) => ({
                 pairId: idx,
                 type: 'word',
@@ -338,28 +1404,21 @@
             if (selectedCard) {
                 const first = selectedCard;
                 if (first === card) return;
-                // 类型相同则切换选中
                 if (first.dataset.type === card.dataset.type) {
                     first.classList.remove('selected');
                     card.classList.add('selected');
                     selectedCard = card;
                     return;
                 }
-                // 类型不同，配对
                 if (first.dataset.pairId === card.dataset.pairId) {
-                    // 配对成功
                     const pairId = parseInt(first.dataset.pairId);
-                    // 从 remainingPairs 中移除该配对
                     remainingPairs = remainingPairs.filter((_, idx) => idx !== pairId);
                     correctCount++;
                     document.getElementById('correctCount').textContent = correctCount;
                     document.getElementById('correctSound').play();
-                    // 移除选中状态
                     first.classList.remove('selected');
                     selectedCard = null;
-                    // 重新渲染游戏板（剩余卡片重新排列对齐）
                     renderGameBoard();
-                    // 检查是否完成
                     if (remainingPairs.length === 0) {
                         gameRunning = false;
                         clearInterval(timerInterval);
@@ -370,7 +1429,6 @@
                         }, 500);
                     }
                 } else {
-                    // 配对失败
                     first.classList.add('wrong');
                     card.classList.add('wrong');
                     first.classList.remove('selected');
@@ -386,7 +1444,6 @@
             }
         }
 
-        // 工具函数
         function shuffleArray(array) {
             for (let i = array.length - 1; i > 0; i--) {
                 const j = Math.floor(Math.random() * (i + 1));
@@ -417,7 +1474,6 @@
             remainingPairs = [];
         }
 
-        // 排行榜
         function updateLeaderboard() {
             const playerName = document.getElementById('playerName').value.trim() || '匿名プレイヤー';
             const time = document.getElementById('timer').textContent;
@@ -432,14 +1488,6 @@
             const tbody = document.querySelector('#leaderboardTable tbody');
             tbody.innerHTML = records.map((r, i) => `<tr><td>${i+1}</td><td>${r.name}</td><td>${r.score}</td><td>${r.time}</td></tr>`).join('');
         }
-
-        // 页面加载默认显示
-        window.onload = function() {
-            if (wordPairs.length === 0) {
-                wordPairs = [...defaultWords];
-                showImportedWords();
-            }
-        };
     </script>
 </body>
 </html>
